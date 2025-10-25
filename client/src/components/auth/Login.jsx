@@ -1,14 +1,6 @@
 import React, { useState } from 'react';
-import {
-  Container,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Box,
-  Alert
-} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import './login.css';
 
 const Login = ({ onLogin }) => {
   const navigate = useNavigate();
@@ -41,49 +33,49 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          Login
-        </Typography>
+    <div className="login-container">
+      <div className="login-paper">
+        <h2 className="login-title">Login</h2>
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
+          <div role="alert" className="login-error">
             {error}
-          </Alert>
+          </div>
         )}
-        <form onSubmit={handleSubmit}>
-          <TextField
-            required
-            fullWidth
-            label="Username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            margin="normal"
-          />
-          <TextField
-            required
-            fullWidth
-            label="Password"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            margin="normal"
-          />
-          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              size="large"
-            >
+
+        <form onSubmit={handleSubmit} className="login-form" noValidate>
+          <label className="login-label">
+            Username
+            <input
+              className="login-input"
+              required
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              aria-label="username"
+            />
+          </label>
+
+          <label className="login-label">
+            Password
+            <input
+              className="login-input"
+              required
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              aria-label="password"
+            />
+          </label>
+
+          <div className="login-actions">
+            <button type="submit" className="login-button">
               Login
-            </Button>
-          </Box>
+            </button>
+          </div>
         </form>
-      </Paper>
-    </Container>
+      </div>
+    </div>
   );
 };
 

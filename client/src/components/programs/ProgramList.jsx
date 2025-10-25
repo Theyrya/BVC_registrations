@@ -1,63 +1,30 @@
 import React from 'react';
-import {
-  Container,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Box
-} from '@mui/material';
 import { programs } from '../../data/mockData';
+import './programList.css';
 
 const ProgramList = () => {
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom align="center">
-        Available Programs
-      </Typography>
-      <Grid container spacing={3}>
+    <div className="programs-container">
+      <h2 className="programs-title">Available Programs</h2>
+      <div className="programs-grid">
         {programs.map((program) => (
-          <Grid item xs={12} md={6} key={program.id}>
-            <Card>
-              <CardContent>
-                <Typography variant="h5" gutterBottom>
-                  {program.name}
-                </Typography>
-                <Typography color="textSecondary" gutterBottom>
-                  Program Code: {program.code}
-                </Typography>
-                <Typography variant="body1" paragraph>
-                  {program.description}
-                </Typography>
-                <Box sx={{ mt: 2 }}>
-                  <Typography variant="body2">
-                    <strong>Duration:</strong> {program.duration}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Term:</strong> {program.term}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Start Date:</strong> {new Date(program.startDate).toLocaleDateString()}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>End Date:</strong> {new Date(program.endDate).toLocaleDateString()}
-                  </Typography>
-                  <Typography variant="body2" sx={{ mt: 1 }}>
-                    <strong>Fees:</strong>
-                  </Typography>
-                  <Typography variant="body2">
-                    Domestic: ${program.fees.domestic.toLocaleString()}
-                  </Typography>
-                  <Typography variant="body2">
-                    International: ${program.fees.international.toLocaleString()}
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
+          <article className="program-card" key={program.id}>
+            <h3 className="program-name">{program.name}</h3>
+            <div className="program-code">Program Code: {program.code}</div>
+            <p className="program-desc">{program.description}</p>
+            <div className="program-meta">
+              <div><strong>Duration:</strong> {program.duration}</div>
+              <div><strong>Term:</strong> {program.term}</div>
+              <div><strong>Start Date:</strong> {new Date(program.startDate).toLocaleDateString()}</div>
+              <div><strong>End Date:</strong> {new Date(program.endDate).toLocaleDateString()}</div>
+              <div className="fees"><strong>Fees:</strong></div>
+              <div>Domestic: ${program.fees.domestic.toLocaleString()}</div>
+              <div>International: ${program.fees.international.toLocaleString()}</div>
+            </div>
+          </article>
         ))}
-      </Grid>
-    </Container>
+      </div>
+    </div>
   );
 };
 

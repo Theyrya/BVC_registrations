@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Paper, Grid, Card, CardContent, Box, Button, TextField } from '@mui/material';
 import { courses as defaultCourses } from '../../data/mockData';
+import './adminDashboard.css';
 
 const MESSAGES_KEY = 'bvc_messages';
 const REG_KEY = 'bvc_registrations';
@@ -49,73 +49,68 @@ const AdminDashboard = () => {
   const allCourses = [...defaultCourses, ...customCourses];
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Typography variant="h5" gutterBottom>Admin Dashboard</Typography>
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6">Messages</Typography>
-            {messages.length === 0 ? (
-              <Typography variant="body2">No messages submitted yet.</Typography>
-            ) : messages.map(m => (
-              <Card key={m.id} sx={{ mt: 1 }}>
-                <CardContent>
-                  <Typography variant="subtitle2">{m.subject}</Typography>
-                  <Typography variant="body2">{m.message}</Typography>
-                  <Typography variant="caption">From: {m.from} — {new Date(m.timestamp).toLocaleString()}</Typography>
-                </CardContent>
-              </Card>
-            ))}
-          </Paper>
-        </Grid>
+    <div className="admin-container">
+      <h3 className="admin-title">Admin Dashboard</h3>
 
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6">Student Registrations (local)</Typography>
-            {Object.keys(registrations).length === 0 && (
-              <Typography variant="body2">No registrations stored locally.</Typography>
-            )}
-            {Object.entries(registrations).map(([term, ids]) => (
-              <Box key={term} sx={{ mt: 1 }}>
-                <Typography variant="subtitle2">{term} — {ids.length} registration(s)</Typography>
-                <ul>
-                  {ids.map(id => (
-                    <li key={id}>{(allCourses.find(c => c.id === id) || { code: 'N/A', name: 'Unknown' }).code} — {(allCourses.find(c => c.id === id) || { name: 'Unknown' }).name}</li>
-                  ))}
-                </ul>
-              </Box>
-            ))}
-          </Paper>
-        </Grid>
+      <div className="admin-grid">
+        <section className="panel">
+          <h4>Messages</h4>
+          {messages.length === 0 ? (
+            <p className="muted">No messages submitted yet.</p>
+          ) : messages.map(m => (
+            <article key={m.id} className="card">
+              <div className="card-body">
+                <strong className="card-subject">{m.subject}</strong>
+                <p className="card-text">{m.message}</p>
+                <small className="card-meta">From: {m.from} — {new Date(m.timestamp).toLocaleString()}</small>
+              </div>
+            </article>
+          ))}
+        </section>
 
-        <Grid item xs={12}>
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6">Manage Custom Courses</Typography>
-            <Box sx={{ display: 'flex', gap: 2, mt: 1, mb: 2 }}>
-              <TextField label="Code" value={newCourse.code} onChange={e => setNewCourse(prev => ({ ...prev, code: e.target.value }))} />
-              <TextField label="Name" value={newCourse.name} onChange={e => setNewCourse(prev => ({ ...prev, name: e.target.value }))} sx={{ flex: 1 }} />
-              <TextField label="Term" value={newCourse.term} onChange={e => setNewCourse(prev => ({ ...prev, term: e.target.value }))} />
-              <TextField label="Credits" type="number" value={newCourse.credits} onChange={e => setNewCourse(prev => ({ ...prev, credits: Number(e.target.value) }))} sx={{ width: 100 }} />
-              <Button variant="contained" onClick={handleAddCourse}>Add</Button>
-            </Box>
+        <section className="panel">
+          <h4>Student Registrations (local)</h4>
+          {Object.keys(registrations).length === 0 && (
+            <p className="muted">No registrations stored locally.</p>
+          )}
+          {Object.entries(registrations).map(([term, ids]) => (
+            <div key={term} className="registration-block">
+              <strong>{term} — {ids.length} registration(s)</strong>
+              <ul>
+                {ids.map(id => (
+                  <li key={id}>{(allCourses.find(c => c.id === id) || { code: 'N/A', name: 'Unknown' }).code} — {(allCourses.find(c => c.id === id) || { name: 'Unknown' }).name}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </section>
+      </div>
 
-            {customCourses.length === 0 ? (
-              <Typography variant="body2">No custom courses added.</Typography>
-            ) : customCourses.map(c => (
-              <Card key={c.id} sx={{ mt: 1 }}>
-                <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Box>
-                    <Typography>{c.code} — {c.name}</Typography>
-                    <Typography variant="caption">Term: {c.term} — Credits: {c.credits}</Typography>
-                  </Box>
-                  <Button color="error" onClick={() => handleRemoveCustom(c.id)}>Remove</Button>
-                </CardContent>
-              </Card>
-            ))}
-          </Paper>
-        </Grid>
-      </Grid>
-    </Container>
+      <section className="panel full">
+        <h4>Manage Custom Courses</h4>
+        <div className="form-row">
+          <input className="small-input" placeholder="Code" value={newCourse.code} onChange={e => setNewCourse(prev => ({ ...prev, code: e.target.value }))} />
+          <input className="flex-input" placeholder="Name" value={newCourse.name} onChange={e => setNewCourse(prev => ({ ...prev, name: e.target.value }))} />
+          <input className="small-input" placeholder="Term" value={newCourse.term} onChange={e => setNewCourse(prev => ({ ...prev, term: e.target.value }))} />
+          <input className="tiny-input" placeholder="Credits" type="number" value={newCourse.credits} onChange={e => setNewCourse(prev => ({ ...prev, credits: Number(e.target.value) }))} />
+          <button type="button" className="btn btn-primary" onClick={handleAddCourse}>Add</button>
+        </div>
+
+        {customCourses.length === 0 ? (
+          <p className="muted">No custom courses added.</p>
+        ) : customCourses.map(c => (
+          <div key={c.id} className="course-card">
+            <div>
+              <div className="course-title">{c.code} — {c.name}</div>
+              <div className="course-meta">Term: {c.term} — Credits: {c.credits}</div>
+            </div>
+            <div>
+              <button type="button" className="btn btn-danger" onClick={() => handleRemoveCustom(c.id)}>Remove</button>
+            </div>
+          </div>
+        ))}
+      </section>
+    </div>
   );
 };
 

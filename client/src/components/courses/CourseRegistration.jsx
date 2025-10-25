@@ -1,20 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Container,
-  Paper,
-  Typography,
-  Grid,
-  TextField,
-  Card,
-  CardContent,
-  CardActions,
-  Button,
-  Box,
-  Alert,
-  Chip
-} from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import { courses as allCourses, TERMS } from '../../data/mockData';
+import './courseRegistration.css';
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
@@ -98,103 +85,75 @@ const CourseRegistration = () => {
   });
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Paper elevation={3} sx={{ p: 3 }}>
-        <Typography variant="h5" gutterBottom>
-          Course Registration
-        </Typography>
+    <div className="course-container">
+      <div className="course-panel">
+        <h2 className="course-title">Course Registration</h2>
 
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
-          <TextField
-            select
-            label="Term"
-            value={selectedTerm}
-            onChange={(e) => setSelectedTerm(e.target.value)}
-            SelectProps={{ native: false }}
-          >
+        <div className="controls">
+          <select className="select" value={selectedTerm} onChange={(e) => setSelectedTerm(e.target.value)}>
             <option value="">-- Select term --</option>
             {TERMS.map((t) => (
               <option key={t} value={t}>{t}</option>
             ))}
-          </TextField>
+          </select>
 
-          <TextField
-            label="Search by code or name"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            sx={{ flex: 1 }}
-          />
+          <input className="search" placeholder="Search by code or name" value={search} onChange={(e) => setSearch(e.target.value)} />
 
-          <Box>
-            <Chip label={`Selected: ${registered.length}`} color={registered.length < 2 ? 'warning' : 'primary'} />
-          </Box>
-        </Box>
+          <div className="chip">Selected: <span className={`count ${registered.length < 2 ? 'warning' : 'primary'}`}>{registered.length}</span></div>
+        </div>
 
         {message && (
-          <Alert severity={message.type} sx={{ mb: 2 }} onClose={() => setMessage(null)}>
+          <div className={`alert ${message.type}`} role="alert">
+            <button className="close" onClick={() => setMessage(null)} aria-label="close">×</button>
             {message.text}
-          </Alert>
+          </div>
         )}
 
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={8}>
-            <Typography variant="h6" gutterBottom>
-              Available Courses ({filtered.length})
-            </Typography>
-            <Grid container spacing={2}>
+        <div className="course-grid">
+          <div className="available">
+            <h3>Available Courses ({filtered.length})</h3>
+            <div className="cards">
               {filtered.map((course) => (
-                <Grid item xs={12} sm={6} key={course.id}>
-                  <Card>
-                    <CardContent>
-                      <Typography variant="h6">{course.code}</Typography>
-                      <Typography color="textSecondary">{course.name}</Typography>
-                      <Typography variant="body2">Term: {course.term}</Typography>
-                      <Typography variant="body2">Credits: {course.credits}</Typography>
-                    </CardContent>
-                    <CardActions>
-                      <Button size="small" onClick={() => handleAdd(course)} disabled={registered.find(c => c.id === course.id) || registered.length >= 5}>
-                        Add
-                      </Button>
-                    </CardActions>
-                  </Card>
-                </Grid>
+                <div className="card" key={course.id}>
+                  <div className="card-content">
+                    <div className="course-code">{course.code}</div>
+                    <div className="course-name">{course.name}</div>
+                    <div className="course-meta">Term: {course.term}</div>
+                    <div className="course-meta">Credits: {course.credits}</div>
+                  </div>
+                  <div className="card-actions">
+                    <button className="btn" onClick={() => handleAdd(course)} disabled={registered.find(c => c.id === course.id) || registered.length >= 5}>Add</button>
+                  </div>
+                </div>
               ))}
-            </Grid>
-          </Grid>
+            </div>
+          </div>
 
-          <Grid item xs={12} md={4}>
-            <Typography variant="h6" gutterBottom>
-              Your Selection
-            </Typography>
+          <aside className="selection">
+            <h3>Your Selection</h3>
             {registered.length === 0 ? (
-              <Typography variant="body2">No courses selected yet.</Typography>
+              <p className="muted">No courses selected yet.</p>
             ) : (
-              <Grid container spacing={1}>
+              <div className="selected-list">
                 {registered.map((course) => (
-                  <Grid item xs={12} key={course.id}>
-                    <Card>
-                      <CardContent>
-                        <Typography variant="subtitle1">{course.code} — {course.name}</Typography>
-                        <Typography variant="body2">Credits: {course.credits}</Typography>
-                      </CardContent>
-                      <CardActions>
-                        <Button size="small" color="error" onClick={() => handleRemove(course)}>Remove</Button>
-                      </CardActions>
-                    </Card>
-                  </Grid>
+                  <div className="card" key={course.id}>
+                    <div className="card-content">
+                      <div className="course-code">{course.code} — {course.name}</div>
+                      <div className="course-meta">Credits: {course.credits}</div>
+                    </div>
+                    <div className="card-actions">
+                      <button className="btn btn-danger" onClick={() => handleRemove(course)}>Remove</button>
+                    </div>
+                  </div>
                 ))}
-              </Grid>
+              </div>
             )}
 
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="body2">
-                Note: You must select at least 2 and at most 5 courses per term. Submitting is simulated and saved locally.
-              </Typography>
-            </Box>
-          </Grid>
-        </Grid>
-      </Paper>
-    </Container>
+            <div className="note">Note: You must select at least 2 and at most 5 courses per term. Submitting is simulated and saved locally.</div>
+          </aside>
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -1,20 +1,7 @@
 import React, { useState } from 'react';
-import {
-  Container,
-  Grid,
-  Paper,
-  Typography,
-  Box,
-  Card,
-  CardContent,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem
-} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { TERMS } from '../../data/mockData';
+import './studentDashboard.css';
 
 const StudentDashboard = () => {
   const [selectedTerm, setSelectedTerm] = useState('');
@@ -46,96 +33,51 @@ const StudentDashboard = () => {
     navigate(`/course-registration?term=${encodeURIComponent(selectedTerm)}`);
   };
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Grid container spacing={3}>
-        {/* Student Information Card */}
-        <Grid item xs={12} md={4}>
-          <Paper elevation={3} sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Student Information
-            </Typography>
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="body1">
-                <strong>Name:</strong> {studentData.firstName} {studentData.lastName}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Student ID:</strong> {studentData.studentId}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Program:</strong> {studentData.program}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Department:</strong> {studentData.department}
-              </Typography>
-            </Box>
-          </Paper>
-        </Grid>
+    <div className="student-container">
+      <div className="student-grid">
+        <section className="panel student-info">
+          <h3>Student Information</h3>
+          <div className="info">
+            <p><strong>Name:</strong> {studentData.firstName} {studentData.lastName}</p>
+            <p><strong>Student ID:</strong> {studentData.studentId}</p>
+            <p><strong>Program:</strong> {studentData.program}</p>
+            <p><strong>Department:</strong> {studentData.department}</p>
+          </div>
+        </section>
 
-        {/* Term Selection Card */}
-        <Grid item xs={12} md={8}>
-          <Paper elevation={3} sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Course Registration
-            </Typography>
-            <FormControl fullWidth sx={{ mt: 2 }}>
-              <InputLabel>Select Term</InputLabel>
-              <Select
-                value={selectedTerm}
-                label="Select Term"
-                onChange={handleTermChange}
-              >
-                {TERMS.map((term) => (
-                  <MenuItem key={term} value={term}>
-                    {term}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-              <Button
-                variant="contained"
-                color="primary"
-                disabled={!selectedTerm}
-                onClick={handleRegisterClick}
-              >
-                Register for Courses
-              </Button>
-            </Box>
-          </Paper>
-        </Grid>
-
-        {/* Registered Courses Card */}
-        <Grid item xs={12}>
-          <Paper elevation={3} sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Currently Registered Courses
-            </Typography>
-            <Grid container spacing={2}>
-              {studentData.registeredCourses.map((course) => (
-                <Grid item xs={12} sm={6} md={4} key={course.code}>
-                  <Card>
-                    <CardContent>
-                      <Typography variant="h6">
-                        {course.code}
-                      </Typography>
-                      <Typography color="textSecondary">
-                        {course.name}
-                      </Typography>
-                      <Typography variant="body2">
-                        Term: {course.term}
-                      </Typography>
-                      <Typography variant="body2">
-                        Credits: {course.credits}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
+        <section className="panel term-select">
+          <h3>Course Registration</h3>
+          <div className="term-control">
+            <label className="term-label">Select Term</label>
+            <select value={selectedTerm} onChange={handleTermChange} className="term-select-input">
+              <option value="">-- Select term --</option>
+              {TERMS.map((term) => (
+                <option key={term} value={term}>{term}</option>
               ))}
-            </Grid>
-          </Paper>
-        </Grid>
-      </Grid>
-    </Container>
+            </select>
+          </div>
+          <div className="actions-row">
+            <button className="btn btn-primary" disabled={!selectedTerm} onClick={handleRegisterClick}>Register for Courses</button>
+          </div>
+        </section>
+
+        <section className="panel full registered-courses">
+          <h3>Currently Registered Courses</h3>
+          <div className="courses-grid">
+            {studentData.registeredCourses.map((course) => (
+              <article className="course-card" key={course.code}>
+                <div className="course-card-body">
+                  <div className="course-code">{course.code}</div>
+                  <div className="course-name">{course.name}</div>
+                  <div className="course-meta">Term: {course.term}</div>
+                  <div className="course-meta">Credits: {course.credits}</div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      </div>
+    </div>
   );
 };
 

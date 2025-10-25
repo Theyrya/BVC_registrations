@@ -1,0 +1,69 @@
+/* Basic styles to replace MUI for the Login form. Tweak colors/spacing as needed. */
+.login-container {
+  max-width: 480px;
+  margin: 3.5rem auto;
+  padding: 0 1rem;
+}
+
+.login-paper {
+  background: #ffffff;
+  padding: 24px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  border-radius: 8px;
+}
+
+.login-title {
+  text-align: center;
+  margin: 0 0 16px 0;
+  font-size: 1.5rem;
+}
+
+.login-error {
+  background: #fdecea;
+  color: #611;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.login-form .login-label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.login-input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 6px;
+  border: 1px solid #cfcfcf;
+  border-radius: 6px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+.login-actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+}
+
+.login-button {
+  padding: 10px 22px;
+  background-color: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.login-button:hover {
+  background-color: #1565c0;
+}
+
+/* Make inputs and button accessible on small screens */
+@media (max-width: 480px) {
+  .login-container { padding: 0 12px; }
+  .login-button { width: 100%; }
+}

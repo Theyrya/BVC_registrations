@@ -1,15 +1,6 @@
 import React, { useState } from 'react';
-import {
-  Container,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Grid,
-  MenuItem,
-  Box
-} from '@mui/material';
 import { programs } from '../../data/mockData';
+import './signup.css';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -42,139 +33,140 @@ const Signup = () => {
   };
 
   return (
-    <Container maxWidth="md">
-      <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          Student Registration
-        </Typography>
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <TextField
+    <div className="signup-container">
+      <div className="signup-paper">
+        <h2 className="signup-title">Student Registration</h2>
+
+        <form onSubmit={handleSubmit} className="signup-form" noValidate>
+          <div className="grid">
+            <label className="field">
+              First Name
+              <input
                 required
-                fullWidth
-                label="First Name"
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
+                className="input"
               />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
+            </label>
+
+            <label className="field">
+              Last Name
+              <input
                 required
-                fullWidth
-                label="Last Name"
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
+                className="input"
               />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
+            </label>
+
+            <label className="field">
+              Email
+              <input
                 required
-                fullWidth
-                label="Email"
                 name="email"
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
+                className="input"
               />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
+            </label>
+
+            <label className="field">
+              Phone
+              <input
                 required
-                fullWidth
-                label="Phone"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
+                className="input"
               />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
+            </label>
+
+            <label className="field">
+              Birthday
+              <input
                 required
-                fullWidth
-                label="Birthday"
                 name="birthday"
                 type="date"
                 value={formData.birthday}
                 onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
+                className="input"
               />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
+            </label>
+
+            <label className="field">
+              Department
+              <input
                 required
-                fullWidth
-                label="Department"
                 name="department"
                 value={formData.department}
                 disabled
+                className="input"
               />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
+            </label>
+
+            <label className="field field-full">
+              Program
+              <select
                 required
-                fullWidth
-                select
-                label="Program"
                 name="program"
                 value={formData.program}
                 onChange={handleChange}
+                className="input"
               >
+                <option value="" disabled>Choose a program</option>
                 {programs.map((program) => (
-                  <MenuItem key={program.id} value={program.code}>
+                  <option key={program.id} value={program.code}>
                     {program.name}
-                  </MenuItem>
+                  </option>
                 ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
+              </select>
+            </label>
+
+            <label className="field">
+              Username
+              <input
                 required
-                fullWidth
-                label="Username"
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
+                className="input"
               />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
+            </label>
+
+            <label className="field">
+              Password
+              <input
                 required
-                fullWidth
-                label="Password"
                 name="password"
                 type="password"
                 value={formData.password}
                 onChange={handleChange}
+                className="input"
               />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
+            </label>
+
+            <label className="field field-full">
+              Confirm Password
+              <input
                 required
-                fullWidth
-                label="Confirm Password"
                 name="confirmPassword"
                 type="password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
+                className="input"
               />
-            </Grid>
-          </Grid>
-          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              size="large"
-            >
-              Sign Up
-            </Button>
-          </Box>
+            </label>
+          </div>
+
+          <div className="actions">
+            <button type="submit" className="submit-button">Sign Up</button>
+          </div>
         </form>
-      </Paper>
-    </Container>
+      </div>
+    </div>
   );
 };
 
