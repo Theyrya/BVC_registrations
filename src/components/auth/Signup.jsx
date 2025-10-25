@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { programs } from '../../data/mockData';
 import '../../styles/shared.css';
 
 const Signup = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -26,10 +29,25 @@ const Signup = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Generate a random student ID (in real app this would come from backend)
+
+    // Optional: Validate password match
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    // Generate a random student ID
     const studentId = 'BVC' + Math.floor(100000 + Math.random() * 900000);
-    console.log('Form submitted:', { ...formData, studentId });
-    // Here you would typically make an API call to register the user
+
+    const userData = { ...formData, studentId };
+
+    // ✅ Save user to localStorage
+    localStorage.setItem('user', JSON.stringify(userData));
+
+    alert("Account created successfully!");
+
+    // ✅ Redirect to Home page (ProgramList)
+    navigate('/');
   };
 
   return (
@@ -38,12 +56,14 @@ const Signup = () => {
         <h2 className="text-center">Student Registration</h2>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-2">
+
             <div>
               <div className="form-group">
                 <label htmlFor="firstName">First Name</label>
                 <input id="firstName" name="firstName" required className="form-control" value={formData.firstName} onChange={handleChange} />
               </div>
             </div>
+
             <div>
               <div className="form-group">
                 <label htmlFor="lastName">Last Name</label>
@@ -57,6 +77,7 @@ const Signup = () => {
                 <input id="email" name="email" type="email" required className="form-control" value={formData.email} onChange={handleChange} />
               </div>
             </div>
+
             <div>
               <div className="form-group">
                 <label htmlFor="phone">Phone</label>
@@ -70,6 +91,7 @@ const Signup = () => {
                 <input id="birthday" name="birthday" type="date" required className="form-control" value={formData.birthday} onChange={handleChange} />
               </div>
             </div>
+
             <div>
               <div className="form-group">
                 <label htmlFor="department">Department</label>
@@ -95,6 +117,7 @@ const Signup = () => {
                 <input id="username" name="username" required className="form-control" value={formData.username} onChange={handleChange} />
               </div>
             </div>
+
             <div>
               <div className="form-group">
                 <label htmlFor="password">Password</label>
@@ -108,6 +131,7 @@ const Signup = () => {
                 <input id="confirmPassword" name="confirmPassword" type="password" required className="form-control" value={formData.confirmPassword} onChange={handleChange} />
               </div>
             </div>
+
           </div>
 
           <div className="flex-center mt-3">
