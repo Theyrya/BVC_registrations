@@ -11,7 +11,6 @@ import ContactForm from './components/ContactForm.jsx';
 import AdminDashboard from './components/admin/AdminDashboard.jsx';
 import './App.css';
 
-
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -35,11 +34,15 @@ function App() {
             isAdmin={isAdmin}
             onLogout={handleLogout}
           />
+
           <Routes>
+            {/* Public Pages */}
             <Route path="/" element={<ProgramList />} />
             <Route path="/programs" element={<ProgramList />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login onLogin={handleLogin} />} />
+
+            {/* Student Protected Routes */}
             <Route
               path="/dashboard"
               element={
@@ -50,6 +53,7 @@ function App() {
                 )
               }
             />
+
             <Route
               path="/course-registration"
               element={
@@ -60,6 +64,7 @@ function App() {
                 )
               }
             />
+
             <Route
               path="/profile"
               element={
@@ -70,6 +75,7 @@ function App() {
                 )
               }
             />
+
             <Route
               path="/contact"
               element={
@@ -80,14 +86,22 @@ function App() {
                 )
               }
             />
+
+            {/* Admin Protected Route */}
             <Route
               path="/admin/dashboard"
-              element={isAuthenticated && isAdmin ? <AdminDashboard /> : <Navigate to="/login" replace />}
+              element={
+                isAuthenticated && isAdmin ? (
+                  <AdminDashboard />
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              }
             />
           </Routes>
         </div>
       </Router>
-      </>
+    </>
   );
 }
 
