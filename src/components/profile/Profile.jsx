@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Paper, Typography, Box, Grid, Card, CardContent, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import '../../styles/shared.css';
 import { courses as allCourses } from '../../data/mockData';
 
 const STORAGE_KEY = 'bvc_registrations';
@@ -38,46 +38,44 @@ const Profile = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-      <Paper elevation={3} sx={{ p: 3 }}>
-        <Typography variant="h5" gutterBottom>Profile</Typography>
-        <Box sx={{ mb: 2 }}>
-          <Typography><strong>Name:</strong> {studentData.firstName} {studentData.lastName}</Typography>
-          <Typography><strong>Student ID:</strong> {studentData.studentId}</Typography>
-          <Typography><strong>Program:</strong> {studentData.program}</Typography>
-          <Typography><strong>Department:</strong> {studentData.department}</Typography>
-        </Box>
+    <div className="container">
+      <div className="card">
+        <h2>Profile</h2>
+        <div className="mb-2">
+          <p><strong>Name:</strong> {studentData.firstName} {studentData.lastName}</p>
+          <p><strong>Student ID:</strong> {studentData.studentId}</p>
+          <p><strong>Program:</strong> {studentData.program}</p>
+          <p><strong>Department:</strong> {studentData.department}</p>
+        </div>
 
-        <Typography variant="h6" gutterBottom>Registered Courses (by term)</Typography>
+        <h3>Registered Courses (by term)</h3>
         {Object.keys(registrations).length === 0 && (
-          <Typography variant="body2">You have no registrations saved locally yet.</Typography>
+          <p className="text-muted">You have no registrations saved locally yet.</p>
         )}
 
-        <Grid container spacing={2} sx={{ mt: 1 }}>
+        <div className="grid grid-1">
           {Object.entries(registrations).map(([term, list]) => (
-            <Grid item xs={12} key={term}>
-              <Card>
-                <CardContent>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="subtitle1">{term} — {list.length} course(s)</Typography>
-                    <Button size="small" onClick={() => handleGoToTerm(term)}>Manage</Button>
-                  </Box>
+            <div key={term}>
+              <div className="card">
+                <div className="flex-between">
+                  <h4>{term} — {list.length} course(s)</h4>
+                  <button className="btn btn-small" onClick={() => handleGoToTerm(term)}>Manage</button>
+                </div>
                   {list.length === 0 ? (
-                    <Typography variant="body2">No courses for this term.</Typography>
+                    <p className="text-muted">No courses for this term.</p>
                   ) : (
                     list.map(c => (
-                      <Box key={c.id} sx={{ mt: 1 }}>
-                        <Typography>{c.code} — {c.name}</Typography>
-                      </Box>
+                      <div key={c.id} className="mt-1">
+                        <p>{c.code} — {c.name}</p>
+                      </div>
                     ))
                   )}
-                </CardContent>
-              </Card>
-            </Grid>
+              </div>
+            </div>
           ))}
-        </Grid>
-      </Paper>
-    </Container>
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -1,15 +1,6 @@
 import React, { useState } from 'react';
-import {
-  Container,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Grid,
-  MenuItem,
-  Box
-} from '@mui/material';
 import { programs } from '../../data/mockData';
+import '../../styles/shared.css';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -42,139 +33,89 @@ const Signup = () => {
   };
 
   return (
-    <Container maxWidth="md">
-      <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          Student Registration
-        </Typography>
+    <div className="container">
+      <div className="card">
+        <h2 className="text-center">Student Registration</h2>
         <form onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                fullWidth
-                label="First Name"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                fullWidth
-                label="Last Name"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                fullWidth
-                label="Email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                fullWidth
-                label="Phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                fullWidth
-                label="Birthday"
-                name="birthday"
-                type="date"
-                value={formData.birthday}
-                onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                fullWidth
-                label="Department"
-                name="department"
-                value={formData.department}
-                disabled
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                select
-                label="Program"
-                name="program"
-                value={formData.program}
-                onChange={handleChange}
-              >
-                {programs.map((program) => (
-                  <MenuItem key={program.id} value={program.code}>
-                    {program.name}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                fullWidth
-                label="Username"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                fullWidth
-                label="Password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                label="Confirm Password"
-                name="confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-              />
-            </Grid>
-          </Grid>
-          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              size="large"
-            >
-              Sign Up
-            </Button>
-          </Box>
+          <div className="grid grid-2">
+            <div>
+              <div className="form-group">
+                <label htmlFor="firstName">First Name</label>
+                <input id="firstName" name="firstName" required className="form-control" value={formData.firstName} onChange={handleChange} />
+              </div>
+            </div>
+            <div>
+              <div className="form-group">
+                <label htmlFor="lastName">Last Name</label>
+                <input id="lastName" name="lastName" required className="form-control" value={formData.lastName} onChange={handleChange} />
+              </div>
+            </div>
+
+            <div>
+              <div className="form-group">
+                <label htmlFor="email">Email</label>
+                <input id="email" name="email" type="email" required className="form-control" value={formData.email} onChange={handleChange} />
+              </div>
+            </div>
+            <div>
+              <div className="form-group">
+                <label htmlFor="phone">Phone</label>
+                <input id="phone" name="phone" required className="form-control" value={formData.phone} onChange={handleChange} />
+              </div>
+            </div>
+
+            <div>
+              <div className="form-group">
+                <label htmlFor="birthday">Birthday</label>
+                <input id="birthday" name="birthday" type="date" required className="form-control" value={formData.birthday} onChange={handleChange} />
+              </div>
+            </div>
+            <div>
+              <div className="form-group">
+                <label htmlFor="department">Department</label>
+                <input id="department" name="department" required className="form-control" value={formData.department} disabled />
+              </div>
+            </div>
+
+            <div style={{ gridColumn: '1 / -1' }}>
+              <div className="form-group">
+                <label htmlFor="program">Program</label>
+                <select id="program" name="program" required className="form-control" value={formData.program} onChange={handleChange}>
+                  <option value="">-- select program --</option>
+                  {programs.map((program) => (
+                    <option key={program.id} value={program.code}>{program.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <div className="form-group">
+                <label htmlFor="username">Username</label>
+                <input id="username" name="username" required className="form-control" value={formData.username} onChange={handleChange} />
+              </div>
+            </div>
+            <div>
+              <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <input id="password" name="password" type="password" required className="form-control" value={formData.password} onChange={handleChange} />
+              </div>
+            </div>
+
+            <div style={{ gridColumn: '1 / -1' }}>
+              <div className="form-group">
+                <label htmlFor="confirmPassword">Confirm Password</label>
+                <input id="confirmPassword" name="confirmPassword" type="password" required className="form-control" value={formData.confirmPassword} onChange={handleChange} />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex-center mt-3">
+            <button type="submit" className="btn btn-primary btn-large">Sign Up</button>
+          </div>
         </form>
-      </Paper>
-    </Container>
+      </div>
+    </div>
   );
 };
 

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material';
 import Navigation from './components/Navigation.jsx';
 import Signup from './components/auth/Signup.jsx';
 import Login from './components/auth/Login.jsx';
@@ -12,7 +11,6 @@ import ContactForm from './components/ContactForm.jsx';
 import AdminDashboard from './components/admin/AdminDashboard.jsx';
 import './App.css';
 
-const theme = createTheme();
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -29,12 +27,12 @@ function App() {
   };
 
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <Router>
         <div className="App">
-          <Navigation 
-            isAuthenticated={isAuthenticated} 
-            isAdmin={isAdmin} 
+          <Navigation
+            isAuthenticated={isAuthenticated}
+            isAdmin={isAdmin}
             onLogout={handleLogout}
           />
           <Routes>
@@ -42,15 +40,15 @@ function App() {
             <Route path="/programs" element={<ProgramList />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login onLogin={handleLogin} />} />
-            <Route 
-              path="/dashboard" 
+            <Route
+              path="/dashboard"
               element={
                 isAuthenticated ? (
                   <StudentDashboard />
                 ) : (
                   <Navigate to="/login" replace />
                 )
-              } 
+              }
             />
             <Route
               path="/course-registration"
@@ -86,11 +84,10 @@ function App() {
               path="/admin/dashboard"
               element={isAuthenticated && isAdmin ? <AdminDashboard /> : <Navigate to="/login" replace />}
             />
-            {/* Add more routes as components are created */}
           </Routes>
         </div>
       </Router>
-    </ThemeProvider>
+      </>
   );
 }
 

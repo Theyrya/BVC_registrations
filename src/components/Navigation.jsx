@@ -42,13 +42,13 @@ function Navigation({ isAuthenticated = false, isAdmin = false, onLogout }) {
           </>
         )}
 
-        {/* Extra example links (fetch/axios) — kept from your simple example */}
+        {/* Extra example links (fetch/axios) — kept from your simple example
         <li><Link to="/fetch">Fetch Example</Link></li>
         <li><Link to="/axios">Axios Example</Link></li>
         <li><Link to="/post">Axios POST Example</Link></li>
         <li><Link to="/post-breakdown">Axios POST Breakdown</Link></li>
         <li><Link to="/update">Axios PUT/UPDATE Example</Link></li>
-        <li><Link to="/delete">Axios DELETE Example</Link></li>
+        <li><Link to="/delete">Axios DELETE Example</Link></li> */}
       </ul>
     </nav>
   );

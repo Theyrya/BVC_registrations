@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Paper, Typography, TextField, Button, Box, Alert } from '@mui/material';
+import '../styles/shared.css';
 
 const MESSAGES_KEY = 'bvc_messages';
 
@@ -25,19 +25,43 @@ const ContactForm = () => {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
-      <Paper elevation={3} sx={{ p: 3 }}>
-        <Typography variant="h5" gutterBottom>Contact Admin</Typography>
-        {success && <Alert severity={success.type} sx={{ mb: 2 }}>{success.text}</Alert>}
+    <div className="container">
+      <div className="card">
+        <h2>Contact Admin</h2>
+        {success && (
+          <div className={`alert alert-${success.type} mb-2`}>
+            {success.text}
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
-          <TextField fullWidth label="Subject" name="subject" value={form.subject} onChange={handleChange} sx={{ mb: 2 }} />
-          <TextField fullWidth multiline rows={6} label="Message" name="message" value={form.message} onChange={handleChange} sx={{ mb: 2 }} />
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button type="submit" variant="contained">Send</Button>
-          </Box>
+          <div className="form-group mb-2">
+            <label htmlFor="subject">Subject</label>
+            <input
+              type="text"
+              id="subject"
+              name="subject"
+              value={form.subject}
+              onChange={handleChange}
+              className="form-control"
+            />
+          </div>
+          <div className="form-group mb-2">
+            <label htmlFor="message">Message</label>
+            <textarea
+              id="message"
+              name="message"
+              value={form.message}
+              onChange={handleChange}
+              rows={6}
+              className="form-control"
+            />
+          </div>
+          <div className="flex-end">
+            <button type="submit" className="btn btn-primary">Send</button>
+          </div>
         </form>
-      </Paper>
-    </Container>
+      </div>
+    </div>
   );
 };
 

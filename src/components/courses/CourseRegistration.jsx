@@ -1,20 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Container,
-  Paper,
-  Typography,
-  Grid,
-  TextField,
-  Card,
-  CardContent,
-  CardActions,
-  Button,
-  Box,
-  Alert,
-  Chip
-} from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import { courses as allCourses, TERMS } from '../../data/mockData';
+import '../../styles/shared.css';
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
@@ -98,103 +85,95 @@ const CourseRegistration = () => {
   });
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Paper elevation={3} sx={{ p: 3 }}>
-        <Typography variant="h5" gutterBottom>
-          Course Registration
-        </Typography>
+    <div className="container">
+      <div className="card">
+        <h1 className="section-title">Course Registration</h1>
 
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
-          <TextField
-            select
-            label="Term"
-            value={selectedTerm}
-            onChange={(e) => setSelectedTerm(e.target.value)}
-            SelectProps={{ native: false }}
-          >
-            <option value="">-- Select term --</option>
-            {TERMS.map((t) => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </TextField>
+        <div className="flex gap-2 mb-3">
+          <div className="form-group">
+            <select
+              className="form-control"
+              value={selectedTerm}
+              onChange={(e) => setSelectedTerm(e.target.value)}
+            >
+              <option value="">-- Select term --</option>
+              {TERMS.map((t) => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
+          </div>
 
-          <TextField
-            label="Search by code or name"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            sx={{ flex: 1 }}
-          />
+          <div className="form-group" style={{ flex: 1 }}>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search by code or name"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
 
-          <Box>
-            <Chip label={`Selected: ${registered.length}`} color={registered.length < 2 ? 'warning' : 'primary'} />
-          </Box>
-        </Box>
+          <div className="badge badge-primary">
+            Selected: {registered.length}
+          </div>
+        </div>
 
         {message && (
-          <Alert severity={message.type} sx={{ mb: 2 }} onClose={() => setMessage(null)}>
+          <div className={`alert alert-${message.type}`}>
             {message.text}
-          </Alert>
+            <button className="btn" style={{ float: 'right' }} onClick={() => setMessage(null)}>×</button>
+          </div>
         )}
 
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={8}>
-            <Typography variant="h6" gutterBottom>
-              Available Courses ({filtered.length})
-            </Typography>
-            <Grid container spacing={2}>
+        <div className="grid grid-2">
+          <div style={{ gridColumn: '1 / span 2' }}>
+            <h2 className="section-title">Available Courses ({filtered.length})</h2>
+            <div className="grid grid-2">
               {filtered.map((course) => (
-                <Grid item xs={12} sm={6} key={course.id}>
-                  <Card>
-                    <CardContent>
-                      <Typography variant="h6">{course.code}</Typography>
-                      <Typography color="textSecondary">{course.name}</Typography>
-                      <Typography variant="body2">Term: {course.term}</Typography>
-                      <Typography variant="body2">Credits: {course.credits}</Typography>
-                    </CardContent>
-                    <CardActions>
-                      <Button size="small" onClick={() => handleAdd(course)} disabled={registered.find(c => c.id === course.id) || registered.length >= 5}>
-                        Add
-                      </Button>
-                    </CardActions>
-                  </Card>
-                </Grid>
+                <div className="card" key={course.id}>
+                  <h3>{course.code}</h3>
+                  <p className="text-secondary">{course.name}</p>
+                  <p>Term: {course.term}</p>
+                  <p className="mb-2">Credits: {course.credits}</p>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => handleAdd(course)}
+                    disabled={registered.find(c => c.id === course.id) || registered.length >= 5}
+                  >
+                    Add
+                  </button>
+                </div>
               ))}
-            </Grid>
-          </Grid>
+            </div>
+          </div>
 
-          <Grid item xs={12} md={4}>
-            <Typography variant="h6" gutterBottom>
-              Your Selection
-            </Typography>
+          <div style={{ gridColumn: '1 / span 2' }}>
+            <h2 className="section-title">Your Selection</h2>
             {registered.length === 0 ? (
-              <Typography variant="body2">No courses selected yet.</Typography>
+              <p>No courses selected yet.</p>
             ) : (
-              <Grid container spacing={1}>
+              <div className="grid grid-3">
                 {registered.map((course) => (
-                  <Grid item xs={12} key={course.id}>
-                    <Card>
-                      <CardContent>
-                        <Typography variant="subtitle1">{course.code} — {course.name}</Typography>
-                        <Typography variant="body2">Credits: {course.credits}</Typography>
-                      </CardContent>
-                      <CardActions>
-                        <Button size="small" color="error" onClick={() => handleRemove(course)}>Remove</Button>
-                      </CardActions>
-                    </Card>
-                  </Grid>
+                  <div className="card" key={course.id}>
+                    <h3>{course.code}</h3>
+                    <p className="text-secondary">{course.name}</p>
+                    <p className="mb-2">Credits: {course.credits}</p>
+                    <button className="btn btn-danger" onClick={() => handleRemove(course)}>
+                      Remove
+                    </button>
+                  </div>
                 ))}
-              </Grid>
+              </div>
             )}
 
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="body2">
-                Note: You must select at least 2 and at most 5 courses per term. Submitting is simulated and saved locally.
-              </Typography>
-            </Box>
-          </Grid>
-        </Grid>
-      </Paper>
-    </Container>
+            <p className="mt-3 text-secondary">
+              Note: You must select at least 2 and at most 5 courses per term. 
+              Submitting is simulated and saved locally.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

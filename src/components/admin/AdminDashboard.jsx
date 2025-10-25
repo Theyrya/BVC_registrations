@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Paper, Grid, Card, CardContent, Box, Button, TextField } from '@mui/material';
 import { courses as defaultCourses } from '../../data/mockData';
+import '../../styles/shared.css';
 
 const MESSAGES_KEY = 'bvc_messages';
 const REG_KEY = 'bvc_registrations';
@@ -49,74 +49,109 @@ const AdminDashboard = () => {
   const allCourses = [...defaultCourses, ...customCourses];
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Typography variant="h5" gutterBottom>Admin Dashboard</Typography>
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6">Messages</Typography>
-            {messages.length === 0 ? (
-              <Typography variant="body2">No messages submitted yet.</Typography>
-            ) : messages.map(m => (
-              <Card key={m.id} sx={{ mt: 1 }}>
-                <CardContent>
-                  <Typography variant="subtitle2">{m.subject}</Typography>
-                  <Typography variant="body2">{m.message}</Typography>
-                  <Typography variant="caption">From: {m.from} — {new Date(m.timestamp).toLocaleString()}</Typography>
-                </CardContent>
-              </Card>
-            ))}
-          </Paper>
-        </Grid>
+    <div className="container">
+      <h1 className="page-title">Admin Dashboard</h1>
+      <div className="grid grid-2">
+        <div className="card">
+          <h2 className="section-title">Messages</h2>
+          {messages.length === 0 ? (
+            <p>No messages submitted yet.</p>
+          ) : messages.map(m => (
+            <div className="card mb-2" key={m.id}>
+              <h3>{m.subject}</h3>
+              <p>{m.message}</p>
+              <p className="text-secondary">
+                From: {m.from} — {new Date(m.timestamp).toLocaleString()}
+              </p>
+            </div>
+          ))}
+        </div>
 
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6">Student Registrations (local)</Typography>
-            {Object.keys(registrations).length === 0 && (
-              <Typography variant="body2">No registrations stored locally.</Typography>
-            )}
-            {Object.entries(registrations).map(([term, ids]) => (
-              <Box key={term} sx={{ mt: 1 }}>
-                <Typography variant="subtitle2">{term} — {ids.length} registration(s)</Typography>
-                <ul>
-                  {ids.map(id => (
-                    <li key={id}>{(allCourses.find(c => c.id === id) || { code: 'N/A', name: 'Unknown' }).code} — {(allCourses.find(c => c.id === id) || { name: 'Unknown' }).name}</li>
-                  ))}
-                </ul>
-              </Box>
-            ))}
-          </Paper>
-        </Grid>
+        <div className="card">
+          <h2 className="section-title">Student Registrations (local)</h2>
+          {Object.keys(registrations).length === 0 && (
+            <p>No registrations stored locally.</p>
+          )}
+          {Object.entries(registrations).map(([term, ids]) => (
+            <div className="mb-2" key={term}>
+              <h3>{term} — {ids.length} registration(s)</h3>
+              <ul>
+                {ids.map(id => (
+                  <li key={id}>
+                    {(allCourses.find(c => c.id === id) || { code: 'N/A', name: 'Unknown' }).code} — 
+                    {(allCourses.find(c => c.id === id) || { name: 'Unknown' }).name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
 
-        <Grid item xs={12}>
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6">Manage Custom Courses</Typography>
-            <Box sx={{ display: 'flex', gap: 2, mt: 1, mb: 2 }}>
-              <TextField label="Code" value={newCourse.code} onChange={e => setNewCourse(prev => ({ ...prev, code: e.target.value }))} />
-              <TextField label="Name" value={newCourse.name} onChange={e => setNewCourse(prev => ({ ...prev, name: e.target.value }))} sx={{ flex: 1 }} />
-              <TextField label="Term" value={newCourse.term} onChange={e => setNewCourse(prev => ({ ...prev, term: e.target.value }))} />
-              <TextField label="Credits" type="number" value={newCourse.credits} onChange={e => setNewCourse(prev => ({ ...prev, credits: Number(e.target.value) }))} sx={{ width: 100 }} />
-              <Button variant="contained" onClick={handleAddCourse}>Add</Button>
-            </Box>
+        <div className="card" style={{ gridColumn: '1 / -1' }}>
+          <h2 className="section-title">Manage Custom Courses</h2>
+          <div className="flex gap-2 mb-3">
+            <div className="form-group">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Course Code"
+                value={newCourse.code}
+                onChange={e => setNewCourse(prev => ({ ...prev, code: e.target.value }))}
+              />
+            </div>
+            <div className="form-group" style={{ flex: 1 }}>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Course Name"
+                value={newCourse.name}
+                onChange={e => setNewCourse(prev => ({ ...prev, name: e.target.value }))}
+              />
+            </div>
+            <div className="form-group">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Term"
+                value={newCourse.term}
+                onChange={e => setNewCourse(prev => ({ ...prev, term: e.target.value }))}
+              />
+            </div>
+            <div className="form-group">
+              <input
+                type="number"
+                className="form-control"
+                placeholder="Credits"
+                value={newCourse.credits}
+                onChange={e => setNewCourse(prev => ({ ...prev, credits: Number(e.target.value) }))}
+              />
+            </div>
+            <button className="btn btn-primary" onClick={handleAddCourse}>
+              Add Course
+            </button>
+          </div>
 
-            {customCourses.length === 0 ? (
-              <Typography variant="body2">No custom courses added.</Typography>
-            ) : customCourses.map(c => (
-              <Card key={c.id} sx={{ mt: 1 }}>
-                <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Box>
-                    <Typography>{c.code} — {c.name}</Typography>
-                    <Typography variant="caption">Term: {c.term} — Credits: {c.credits}</Typography>
-                  </Box>
-                  <Button color="error" onClick={() => handleRemoveCustom(c.id)}>Remove</Button>
-                </CardContent>
-              </Card>
-            ))}
-          </Paper>
-        </Grid>
-      </Grid>
-    </Container>
+          {customCourses.length === 0 ? (
+            <p>No custom courses added.</p>
+          ) : customCourses.map(c => (
+            <div className="card mb-2" key={c.id}>
+              <div className="flex flex-between flex-center">
+                <div>
+                  <h3>{c.code} — {c.name}</h3>
+                  <p className="text-secondary">Term: {c.term} — Credits: {c.credits}</p>
+                </div>
+                <button className="btn btn-danger" onClick={() => handleRemoveCustom(c.id)}>
+                  Remove
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 };
+
+
 
 export default AdminDashboard;

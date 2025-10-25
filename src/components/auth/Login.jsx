@@ -1,14 +1,6 @@
 import React, { useState } from 'react';
-import {
-  Container,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Box,
-  Alert
-} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import '../../styles/shared.css';
 
 const Login = ({ onLogin }) => {
   const navigate = useNavigate();
@@ -41,49 +33,44 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          Login
-        </Typography>
+    <div className="container">
+      <div className="card">
+        <h2 className="text-center">Login</h2>
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
+          <div className="alert alert-error mb-2">{error}</div>
         )}
         <form onSubmit={handleSubmit}>
-          <TextField
-            required
-            fullWidth
-            label="Username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            margin="normal"
-          />
-          <TextField
-            required
-            fullWidth
-            label="Password"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            margin="normal"
-          />
-          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              size="large"
-            >
-              Login
-            </Button>
-          </Box>
+          <div className="form-group">
+            <label htmlFor="username">Username</label>
+            <input
+              id="username"
+              name="username"
+              required
+              className="form-control"
+              value={formData.username}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              className="form-control"
+              value={formData.password}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="flex-center mt-3">
+            <button type="submit" className="btn btn-primary btn-large">Login</button>
+          </div>
         </form>
-      </Paper>
-    </Container>
+      </div>
+    </div>
   );
 };
 
