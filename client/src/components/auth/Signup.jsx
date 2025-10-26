@@ -57,8 +57,8 @@ const Signup = ({ onSignup }) => {
 
     console.log('Registered user:', user);
 
-    // Redirect to programs list
-    navigate('/programs');
+    // Redirect to dashboard after signup
+    navigate('/dashboard');
   };
 
   return (

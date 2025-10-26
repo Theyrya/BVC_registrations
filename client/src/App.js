@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navigation from './components/navigation/Navigation';
 import Signup from './components/auth/Signup.jsx';
@@ -14,15 +14,38 @@ import './App.css';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
-  const handleLogin = (authenticated, admin) => {
-    setIsAuthenticated(authenticated);
-    setIsAdmin(admin);
+  // restore auth from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('auth'));
+      if (stored && stored.isAuthenticated) {
+        setIsAuthenticated(true);
+        setIsAdmin(!!stored.isAdmin);
+        setCurrentUser(stored.user || null);
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
+  const handleAuth = (auth, admin = false, user = null) => {
+    setIsAuthenticated(!!auth);
+    setIsAdmin(!!admin);
+    setCurrentUser(user || null);
+    if (auth) {
+      localStorage.setItem('auth', JSON.stringify({ isAuthenticated: true, isAdmin: admin, user }));
+    } else {
+      localStorage.removeItem('auth');
+    }
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     setIsAdmin(false);
+    setCurrentUser(null);
+    localStorage.removeItem('auth');
   };
 
   return (
@@ -38,8 +61,8 @@ function App() {
             <Route path="/" element={<ProgramList />} />
             <Route path="/programs" element={<ProgramList />} />
             <Route path="/courses" element={<CourseRegistration />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login onLogin={handleLogin} />} />
+            <Route path="/signup" element={<Signup onSignup={handleAuth} />} />
+            <Route path="/login" element={<Login onLogin={handleAuth} />} />
             <Route 
               path="/dashboard" 
               element={
