@@ -1,64 +1,108 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './navigation.style.css';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Navigation from './components/Navigation.jsx';
+import Signup from './components/auth/Signup.jsx';
+import Login from './components/auth/Login.jsx';
+import ProgramList from './components/programs/ProgramList.jsx';
+import StudentDashboard from './components/dashboard/StudentDashboard.jsx';
+import CourseRegistration from './components/courses/CourseRegistration.jsx';
+import Profile from './components/profile/Profile.jsx';
+import ContactForm from './components/ContactForm.jsx';
+import AdminDashboard from './components/admin/AdminDashboard.jsx';
+import './App.css';
 
-function Navigation({ isAuthenticated = false, isAdmin = false, onLogout }) {
-  const handleLogout = (e) => {
-    e && e.preventDefault();
-    if (typeof onLogout === 'function') onLogout();
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const handleLogin = (authenticated, admin) => {
+    setIsAuthenticated(authenticated);
+    setIsAdmin(admin);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setIsAdmin(false);
   };
 
   return (
-    <nav className="nav-root">
-      <ul className="nav-list">
-        <li className="nav-brand"><Link to="/">BVC Registration</Link></li>
+    <>
+      <Router>
+        <div className="App">
+          <Navigation
+            isAuthenticated={isAuthenticated}
+            isAdmin={isAdmin}
+            onLogout={handleLogout}
+          />
 
-        {!isAuthenticated && (
-          <>
-            <li><Link to="/programs">Programs</Link></li>
-            <li><Link to="/courses">Courses</Link></li>
-            <li><Link to="/signup">Sign Up</Link></li>
-            <li><Link to="/login">Login</Link></li>
-          </>
-        )}
+          <Routes>
+            {/* Public Pages */}
+            <Route path="/" element={<ProgramList />} />
+            <Route path="/programs" element={<ProgramList />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login onLogin={handleLogin} />} />
 
-        {isAuthenticated && isAdmin && (
-          <>
-            <li><Link to="/admin/dashboard">Dashboard</Link></li>
-            <li><Link to="/admin/courses">Manage Courses</Link></li>
-            <li><Link to="/admin/students">View Students</Link></li>
-            <li><Link to="/admin/messages">Messages</Link></li>
-            <li><a href="#logout" onClick={handleLogout}>Logout</a></li>
-          </>
-        )}
+            {/* Student Protected Routes */}
+            <Route
+              path="/dashboard"
+              element={
+                isAuthenticated ? (
+                  <StudentDashboard />
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              }
+            />
 
-        {isAuthenticated && !isAdmin && (
-          <>
-            <li><Link to="/dashboard">Dashboard</Link></li>
-            <li><Link to="/profile">Profile</Link></li>
-            <li><Link to="/course-registration">Register Courses</Link></li>
-            <li><Link to="/contact">Contact Admin</Link></li>
-            <li><a href="#logout" onClick={handleLogout}>Logout</a></li>
-          </>
-        )}
+            <Route
+              path="/course-registration"
+              element={
+                isAuthenticated ? (
+                  <CourseRegistration />
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              }
+            />
 
-        {/* Extra example links (fetch/axios) — kept from your simple example
-        <li><Link to="/fetch">Fetch Example</Link></li>
-        <li><Link to="/axios">Axios Example</Link></li>
-        <li><Link to="/post">Axios POST Example</Link></li>
-        <li><Link to="/post-breakdown">Axios POST Breakdown</Link></li>
-        <li><Link to="/update">Axios PUT/UPDATE Example</Link></li>
-        <li><Link to="/delete">Axios DELETE Example</Link></li> */}
-      </ul>
-    </nav>
+            <Route
+              path="/profile"
+              element={
+                isAuthenticated ? (
+                  <Profile />
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              }
+            />
+
+            <Route
+              path="/contact"
+              element={
+                isAuthenticated ? (
+                  <ContactForm />
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              }
+            />
+
+            {/* Admin Protected Route */}
+            <Route
+              path="/admin/dashboard"
+              element={
+                isAuthenticated && isAdmin ? (
+                  <AdminDashboard />
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              }
+            />
+          </Routes>
+        </div>
+      </Router>
+    </>
   );
 }
 
-export default Navigation;
-
-/*
-This component provides a simple list-style navigation. It preserves the same
-routes and conditional rendering (unauthenticated, authenticated student,
-authenticated admin) as the previous MUI-based version but uses plain links
-and a CSS file `navigation.style.css` for styling.
-*/
+export default App;

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { programs } from '../../data/mockData';
 import '../../styles/shared.css';
 
-const Signup = () => {
+const Signup = ({ onSignup }) => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -19,34 +19,53 @@ const Signup = () => {
     confirmPassword: ''
   });
 
+  const [error, setError] = useState('');
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setError('');
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Optional: Validate password match
+    // Basic validation
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      setError('Passwords do not match.');
+      return;
+    }
+    if (!formData.username || !formData.password) {
+      setError('Username and password are required.');
       return;
     }
 
-    // Generate a random student ID
+    // Load users from localStorage
+    const existingUsers = JSON.parse(localStorage.getItem('users')) || [];
+
+    // Check duplicate username
+    const duplicate = existingUsers.some(u => u.username === formData.username);
+    if (duplicate) {
+      setError('Username already exists. Choose another one.');
+      return;
+    }
+
+    // Create studentId and user object
     const studentId = 'BVC' + Math.floor(100000 + Math.random() * 900000);
+    const user = { ...formData, studentId, isAdmin: false };
 
-    const userData = { ...formData, studentId };
+    // Save to users array
+    const updatedUsers = [...existingUsers, user];
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
 
-    // ✅ Save user to localStorage
-    localStorage.setItem('user', JSON.stringify(userData));
+    // Persist current auth (auto-login)
+    // onSignup expects (auth:boolean, admin:boolean, user:object)
+    if (onSignup) onSignup(true, false, user);
 
-    alert("Account created successfully!");
+    // also write auth to localStorage (so page reload keeps logged-in)
+    localStorage.setItem('auth', JSON.stringify({ isAuthenticated: true, isAdmin: false, user }));
 
-    // ✅ Redirect to Home page (ProgramList)
+    // Redirect to home (/)
     navigate('/');
   };
 
@@ -54,6 +73,9 @@ const Signup = () => {
     <div className="container">
       <div className="card">
         <h2 className="text-center">Student Registration</h2>
+
+        {error && <div className="alert alert-error mb-2">{error}</div>}
+
         <form onSubmit={handleSubmit}>
           <div className="grid grid-2">
 
