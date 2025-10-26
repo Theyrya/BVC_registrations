@@ -37,6 +37,7 @@ function App() {
           <Routes>
             <Route path="/" element={<ProgramList />} />
             <Route path="/programs" element={<ProgramList />} />
+            <Route path="/courses" element={<CourseRegistration />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login onLogin={handleLogin} />} />
             <Route 
