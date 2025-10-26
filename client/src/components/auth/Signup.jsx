@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { programs } from '../../data/mockData';
 import './signup.css';
 
-const Signup = () => {
+const Signup = ({ onSignup }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -26,10 +28,37 @@ const Signup = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Basic validation
+    if (formData.password !== formData.confirmPassword) {
+      alert('Passwords do not match.');
+      return;
+    }
+
     // Generate a random student ID (in real app this would come from backend)
     const studentId = 'BVC' + Math.floor(100000 + Math.random() * 900000);
-    console.log('Form submitted:', { ...formData, studentId });
-    // Here you would typically make an API call to register the user
+
+    // Save user to localStorage (simple local mock of registration)
+    const existingUsers = JSON.parse(localStorage.getItem('users')) || [];
+    const duplicate = existingUsers.some(u => u.username === formData.username);
+    if (duplicate) {
+      alert('Username already exists. Choose another username.');
+      return;
+    }
+
+    const user = { ...formData, studentId, isAdmin: false };
+    const updatedUsers = [...existingUsers, user];
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+
+    // Persist auth state locally so reloads can read it
+    localStorage.setItem('auth', JSON.stringify({ isAuthenticated: true, isAdmin: false, user }));
+
+    // If parent provided a handler, call it (backwards-compatible)
+    if (onSignup) onSignup(true, false, user);
+
+    console.log('Registered user:', user);
+
+    // Redirect to programs list
+    navigate('/programs');
   };
 
   return (

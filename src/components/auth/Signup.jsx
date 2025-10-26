@@ -65,8 +65,8 @@ const Signup = ({ onSignup }) => {
     // also write auth to localStorage (so page reload keeps logged-in)
     localStorage.setItem('auth', JSON.stringify({ isAuthenticated: true, isAdmin: false, user }));
 
-    // Redirect to home (/)
-    navigate('/');
+    // Redirect to program list after successful signup
+    navigate('/programs');
   };
 
   return (
