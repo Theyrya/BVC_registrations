@@ -1,5 +1,7 @@
+// src/App.js
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+
 import Navigation from './components/navigation/Navigation';
 import Signup from './components/auth/Signup.jsx';
 import Login from './components/auth/Login.jsx';
@@ -9,23 +11,26 @@ import CourseRegistration from './components/courses/CourseRegistration.jsx';
 import Profile from './components/profile/Profile.jsx';
 import ContactForm from './components/contactform/ContactForm.jsx';
 import AdminDashboard from './components/admin/AdminDashboard.jsx';
+import AdminStudentDetail from './components/admin/AdminStudentDetail.jsx';
+import AdminCourseDetail from './components/admin/AdminCourseDetail.jsx';
+
 import './App.css';
 
-function App() {
+const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
 
-  // restore auth from localStorage on mount
+  // Restore auth state
   useEffect(() => {
     try {
       const stored = JSON.parse(localStorage.getItem('auth'));
-      if (stored && stored.isAuthenticated) {
+      if (stored?.isAuthenticated) {
         setIsAuthenticated(true);
         setIsAdmin(!!stored.isAdmin);
-        setCurrentUser(stored.user || null);
+        setCurrentUser(stored.user ?? null);
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
   }, []);
@@ -33,7 +38,7 @@ function App() {
   const handleAuth = (auth, admin = false, user = null) => {
     setIsAuthenticated(!!auth);
     setIsAdmin(!!admin);
-    setCurrentUser(user || null);
+    setCurrentUser(user ?? null);
     if (auth) {
       localStorage.setItem('auth', JSON.stringify({ isAuthenticated: true, isAdmin: admin, user }));
     } else {
@@ -41,77 +46,45 @@ function App() {
     }
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setIsAdmin(false);
-    setCurrentUser(null);
-    localStorage.removeItem('auth');
-  };
+  const handleLogout = () => handleAuth(false);
+
+  // Route guards
+  const PrivateRoute = ({ children }) =>
+    isAuthenticated ? children : <Navigate to="/login" replace />;
+
+  const AdminRoute = ({ children }) =>
+    isAuthenticated && isAdmin ? children : <Navigate to="/" replace />;
 
   return (
     <Router>
-      <div className="App">
-        <Navigation 
-          isAuthenticated={isAuthenticated} 
-          isAdmin={isAdmin} 
-          onLogout={handleLogout}
-        />
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={<ProgramList />} />
-            <Route path="/programs" element={<ProgramList />} />
-            <Route path="/courses" element={<CourseRegistration />} />
-            <Route path="/signup" element={<Signup onSignup={handleAuth} />} />
-            <Route path="/login" element={<Login onLogin={handleAuth} />} />
-            <Route 
-              path="/dashboard" 
-              element={
-                isAuthenticated ? (
-                  <StudentDashboard />
-                ) : (
-                  <Navigate to="/login" replace />
-                )
-              } 
-            />
-            <Route
-              path="/course-registration"
-              element={
-                isAuthenticated ? (
-                  <CourseRegistration />
-                ) : (
-                  <Navigate to="/login" replace />
-                )
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                isAuthenticated ? (
-                  <Profile />
-                ) : (
-                  <Navigate to="/login" replace />
-                )
-              }
-            />
-            <Route
-              path="/contact"
-              element={
-                isAuthenticated ? (
-                  <ContactForm />
-                ) : (
-                  <Navigate to="/login" replace />
-                )
-              }
-            />
-            <Route
-              path="/admin/dashboard"
-              element={isAuthenticated && isAdmin ? <AdminDashboard /> : <Navigate to="/login" replace />}
-            />
-          </Routes>
-        </main>
-      </div>
+      <Navigation isAuthenticated={isAuthenticated} isAdmin={isAdmin} onLogout={handleLogout} />
+      <Routes>
+        {/* Public */}
+        <Route path="/" element={<ProgramList />} />
+        <Route path="/programs" element={<ProgramList />} />
+        {/* Temporary alias for 'courses' landing; reuse ProgramList for now */}
+        <Route path="/courses" element={<ProgramList />} />
+        <Route path="/signup" element={<Signup onSignup={(u) => handleAuth(true, false, u)} />} />
+        <Route path="/login" element={<Login onLogin={handleAuth} />} />
+
+        {/* Student */}
+        <Route path="/dashboard" element={<PrivateRoute><StudentDashboard /></PrivateRoute>} />
+        <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+        <Route path="/course-registration" element={<PrivateRoute><CourseRegistration /></PrivateRoute>} />
+        <Route path="/contact" element={<PrivateRoute><ContactForm /></PrivateRoute>} />
+
+        {/* Admin (single page, tabbed by query string) */}
+        <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+        <Route path="/admin/students/:studentId" element={<AdminRoute><AdminStudentDetail /></AdminRoute>}/>
+        <Route path="/admin/courses/:courseRef" element={<AdminRoute><AdminCourseDetail /></AdminRoute>}/>
+
+
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </Router>
   );
-}
+};
 
 export default App;
