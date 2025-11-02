@@ -47,10 +47,18 @@
 .course-card { display: flex; justify-content: space-between; align-items: center; padding: 10px; border: 1px solid #f0f0f0; border-radius: 6px; margin-top: 10px; }
 .course-title { font-weight: 600; }
 .course-meta { color: #666; font-size: 0.9rem; }
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
 
 @media (max-width: 800px) {
   .admin-grid { grid-template-columns: 1fr; }
   .form-row { flex-direction: column; align-items: stretch; }
   .small-input, .tiny-input, .flex-input { width: 100%; }
+  .courses-grid { grid-template-columns: 1fr; }
   .btn { width: 100%; }
 }
+
