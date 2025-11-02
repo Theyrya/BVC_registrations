@@ -23,7 +23,7 @@ const Login = ({ onLogin }) => {
     // Mock login logic (replace with actual backend integration later)
     if (formData.username === 'admin' && formData.password === 'admin123') {
       onLogin(true, true); // isAuthenticated, isAdmin
-      navigate('/admin/dashboard');
+      navigate('/admin/AdminDashboard');
     } else if (formData.username && formData.password) {
       onLogin(true, false); // isAuthenticated, not admin
       navigate('/dashboard');
