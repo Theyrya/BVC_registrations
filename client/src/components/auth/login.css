@@ -1,0 +1,183 @@
+/* Basic styles to replace MUI for the Login form. Tweak colors/spacing as needed. */
+
+
+body:has(.login-container) .hero{ display:none !important; }
+.login-container .hero,
+.login-container ~ .hero{ display:none !important; }
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap');
+
+
+*{ box-sizing:border-box }
+html,body{ height:100% }
+body{
+  margin:0;
+  font-family:'Outfit',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  color:#0f172a;
+  background:
+    radial-gradient(900px 520px at -10% -10%, rgba(99,102,241,.14), transparent 60%),
+    radial-gradient(900px 520px at 110% 0%, rgba(236,72,153,.12), transparent 60%),
+    #f6f8ff;
+}
+
+.login-page{
+  min-height: calc(100dvh - 80px);
+  display:grid;
+  place-items:center;
+  padding: 32px 16px;
+}
+
+.auth-wrap{
+  width:min(1120px, 100%);
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-radius: 20px;
+  overflow:hidden;
+  background:#fff;
+  box-shadow: 0 26px 70px rgba(17,24,39,.12);
+  border: 1px solid rgba(15,23,42,.06);
+}
+
+.showcase{
+  background: linear-gradient(135deg, #9333ea 0%, #6366f1 60%, #22d3ee 120%);
+  position:relative;
+}
+
+.showcase-media{
+  position:relative;
+  height:100%;
+  min-height: 520px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+}
+
+.showcase-img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  animation: fadeIn .7s ease;
+  transform: scale(1.04);
+}
+
+.showcase-overlay{
+  position:absolute;
+  inset:0;
+  background: radial-gradient(80% 80% at 20% 20%, rgba(255,255,255,.08), transparent 60%);
+  mix-blend-mode: overlay;
+}
+
+.showcase-caption{
+  position:relative;
+  z-index:2;
+  align-self:end;
+  width: 88%;
+  margin-bottom: 22px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: rgba(15,23,42,.52);
+  color:#fff;
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 18px 40px rgba(2,6,23,.22);
+}
+.showcase-caption h3{ margin:0 0 4px; font-size:1.25rem; font-weight:800; }
+.showcase-caption p{ margin:0; opacity:.92; }
+
+.login-container{
+  display:grid;
+  place-items:center;
+  padding: 22px;
+  background: linear-gradient(180deg, #ffffff, #fbfcff);
+}
+
+.login-paper{
+  width:min(520px, 100%);
+  background:#ffffff;
+  border:1px solid #eef0f3;
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(2,6,23,.08);
+  padding: 26px 24px 22px;
+}
+
+.login-title{
+  margin:0 0 10px;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color:#0b1224;
+}
+
+.login-error{
+  background:#fef2f2;
+  color:#b91c1c;
+  border:1px solid #fecaca;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-weight:700;
+  margin-bottom:10px;
+}
+
+.login-form{
+  display:grid;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.login-label{
+  display:grid;
+  gap:6px;
+  font-weight:700;
+  color:#0b1224;
+}
+
+.login-input{
+  width:100%;
+  padding:12px 14px;
+  border:1px solid #d7dae0;
+  border-radius: 12px;
+  font-size:1rem;
+  background:#f9fafb;
+  transition:border-color .18s ease, box-shadow .18s ease, transform .06s ease;
+}
+.login-input:hover{ border-color:#b4c0ff }
+.login-input:focus{
+  outline:none;
+  border-color:#6366f1;
+  box-shadow:0 0 0 4px rgba(99,102,241,.22);
+  transform: translateY(-1px);
+  background:#fff;
+}
+
+.login-actions{ margin-top: 2px; }
+
+.login-button{
+  width:100%;
+  height:48px;
+  border:none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+  color:#fff;
+  font-weight:900;
+  letter-spacing:.25px;
+  cursor:pointer;
+  box-shadow: 0 16px 32px rgba(99,102,241,.28);
+  transition: transform .15s ease, box-shadow .40s ease, filter .15s ease;
+}
+.login-button:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 22px 40px rgba(99,102,241,.34);
+  filter: brightness(1.04);
+}
+
+@keyframes fadeIn{
+  from{ opacity:0; transform: scale(1.06) }
+  to{ opacity:1; transform: scale(1.04) }
+}
+
+@media (max-width: 980px){
+  .auth-wrap{ grid-template-columns: 1fr; }
+  .showcase-media{ min-height: 300px; }
+}

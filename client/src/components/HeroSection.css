@@ -1,0 +1,72 @@
+.hero {
+  position: relative;
+  width: 100%;
+}
+
+.programs-hero { 
+  display: none !important;
+ }
+
+.hero .overlay {
+  background-image: url('https://assets.universitas123.com/images/114846/BV/bv_activities.jpg');
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
+  height: 70vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  color: white;
+}
+
+.hero .overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1;
+}
+
+.hero .profile-img {
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 20px;
+  object-fit: cover;
+  border: 3px solid white;
+  position: relative;
+  z-index: 2;
+}
+
+.hero .hero-quote {
+  font-size: 1.5rem;
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.hero .content {
+  padding: 60px 20px;
+  background-color: #f4f4f4;
+  text-align: center;
+}
+
+.hero .content h2 {
+  margin-top: 0;
+  color: #333;
+}
+
+.hero .content p {
+  max-width: 800px;
+  margin: 20px auto;
+  color: #666;
+  line-height: 1.6;
+}
