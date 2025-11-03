@@ -10,6 +10,9 @@ import CourseRegistration from './components/courses/CourseRegistration.jsx';
 import Profile from './components/profile/Profile.jsx';
 import ContactForm from './components/contactform/ContactForm.jsx';
 import AdminDashboard from './components/admin/AdminDashboard.jsx';
+import AdminStudents from './components/admin/AdminStudents.jsx';
+import AdminMessages from './components/admin/AdminMessages.jsx';
+import AdminCourses from './components/admin/AdminCourses.jsx';
 import './App.css';
 
 function App() {
@@ -108,6 +111,18 @@ function App() {
             <Route
               path="/admin/dashboard"
               element={isAuthenticated && isAdmin ? <AdminDashboard /> : <Navigate to="/login" replace />}
+            />
+            <Route
+              path="/admin/courses"
+              element={isAuthenticated && isAdmin ? <AdminCourses /> : <Navigate to="/login" replace />}
+            />
+            <Route
+              path="/admin/students"
+              element={isAuthenticated && isAdmin ? <AdminStudents /> : <Navigate to="/login" replace />}
+            />
+            <Route
+              path="/admin/messages"
+              element={isAuthenticated && isAdmin ? <AdminMessages /> : <Navigate to="/login" replace />}
             />
           </Routes>
         </main>

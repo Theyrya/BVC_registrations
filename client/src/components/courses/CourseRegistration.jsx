@@ -3,6 +3,8 @@ import { useLocation } from 'react-router-dom';
 import { courses as allCourses, TERMS } from '../../data/mockData';
 import './courseRegistration.css';
 
+const STORAGE_KEY = 'bvc_registrations';
+
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 };

@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { courses as defaultCourses } from '../../data/mockData';
 import './adminDashboard.css';
 
 const MESSAGES_KEY = 'bvc_messages';
-const REG_KEY = 'bvc_registrations';
-const CUSTOM_COURSES_KEY = 'bvc_custom_courses';
+const USERS_KEY = 'users';
 
 const AdminDashboard = () => {
   const [messages, setMessages] = useState([]);
-  const [registrations, setRegistrations] = useState({});
-  const [customCourses, setCustomCourses] = useState([]);
-  const [newCourse, setNewCourse] = useState({ code: '', name: '', term: 'Winter', credits: 3 });
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     try {
@@ -19,34 +15,12 @@ const AdminDashboard = () => {
     } catch (e) { setMessages([]); }
 
     try {
-      const raw = localStorage.getItem(REG_KEY);
-      setRegistrations(raw ? JSON.parse(raw) : {});
-    } catch (e) { setRegistrations({}); }
-
-    try {
-      const raw = localStorage.getItem(CUSTOM_COURSES_KEY);
-      setCustomCourses(raw ? JSON.parse(raw) : []);
-    } catch (e) { setCustomCourses([]); }
+      const raw = localStorage.getItem(USERS_KEY);
+      setUsers(raw ? JSON.parse(raw) : []);
+    } catch (e) { setUsers([]); }
   }, []);
 
-  const saveCustom = (next) => {
-    setCustomCourses(next);
-    localStorage.setItem(CUSTOM_COURSES_KEY, JSON.stringify(next));
-  };
-
-  const handleAddCourse = () => {
-    const course = { id: Date.now(), ...newCourse };
-    const next = [...customCourses, course];
-    saveCustom(next);
-    setNewCourse({ code: '', name: '', term: 'Winter', credits: 3 });
-  };
-
-  const handleRemoveCustom = (id) => {
-    const next = customCourses.filter(c => c.id !== id);
-    saveCustom(next);
-  };
-
-  const allCourses = [...defaultCourses, ...customCourses];
+  // Methods moved to AdminCourses.jsx
 
   return (
     <div className="admin-container">
@@ -68,48 +42,26 @@ const AdminDashboard = () => {
           ))}
         </section>
 
+        {/* Student registrations removed from dashboard to keep Manage Courses focused */}
+
         <section className="panel">
-          <h4>Student Registrations (local)</h4>
-          {Object.keys(registrations).length === 0 && (
-            <p className="muted">No registrations stored locally.</p>
-          )}
-          {Object.entries(registrations).map(([term, ids]) => (
-            <div key={term} className="registration-block">
-              <strong>{term} — {ids.length} registration(s)</strong>
-              <ul>
-                {ids.map(id => (
-                  <li key={id}>{(allCourses.find(c => c.id === id) || { code: 'N/A', name: 'Unknown' }).code} — {(allCourses.find(c => c.id === id) || { name: 'Unknown' }).name}</li>
-                ))}
-              </ul>
-            </div>
+          <h4>Registered Students</h4>
+          {users.length === 0 ? (
+            <p className="muted">No students have signed up yet.</p>
+          ) : users.map(u => (
+            <article key={u.username || u.studentId || u.email} className="card">
+              <div className="card-body">
+                <strong className="card-subject">{u.firstName} {u.lastName} {u.studentId ? `— ${u.studentId}` : ''}</strong>
+                <p className="card-text">Program: {u.program || 'N/A'} — Department: {u.department || 'N/A'}</p>
+                <p className="card-text">Email: {u.email} — Phone: {u.phone}</p>
+                <small className="card-meta">Username: {u.username}</small>
+              </div>
+            </article>
           ))}
         </section>
       </div>
 
-      <section className="panel full">
-        <h4>Manage Custom Courses</h4>
-        <div className="form-row">
-          <input className="small-input" placeholder="Code" value={newCourse.code} onChange={e => setNewCourse(prev => ({ ...prev, code: e.target.value }))} />
-          <input className="flex-input" placeholder="Name" value={newCourse.name} onChange={e => setNewCourse(prev => ({ ...prev, name: e.target.value }))} />
-          <input className="small-input" placeholder="Term" value={newCourse.term} onChange={e => setNewCourse(prev => ({ ...prev, term: e.target.value }))} />
-          <input className="tiny-input" placeholder="Credits" type="number" value={newCourse.credits} onChange={e => setNewCourse(prev => ({ ...prev, credits: Number(e.target.value) }))} />
-          <button type="button" className="btn btn-primary" onClick={handleAddCourse}>Add</button>
-        </div>
-
-        {customCourses.length === 0 ? (
-          <p className="muted">No custom courses added.</p>
-        ) : customCourses.map(c => (
-          <div key={c.id} className="course-card">
-            <div>
-              <div className="course-title">{c.code} — {c.name}</div>
-              <div className="course-meta">Term: {c.term} — Credits: {c.credits}</div>
-            </div>
-            <div>
-              <button type="button" className="btn btn-danger" onClick={() => handleRemoveCustom(c.id)}>Remove</button>
-            </div>
-          </div>
-        ))}
-      </section>
+      {/* Course management moved to AdminCourses.jsx */}
     </div>
   );
 };
