@@ -48,15 +48,38 @@ const Login = ({ onLogin }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError('');
+
+    // Check for admin login first
     if (formData.username === 'admin' && formData.password === 'admin123') {
+      const adminUser = {
+        username: 'admin',
+        isAdmin: true
+      };
+      localStorage.setItem('auth', JSON.stringify({ isAuthenticated: true, isAdmin: true, user: adminUser }));
       onLogin(true, true);
       navigate('/admin/dashboard');
-    } else if (formData.username && formData.password) {
-      onLogin(true, false);
-      navigate('/dashboard');
-    } else {
-      setError('Invalid username or password');
+      return;
     }
+
+    // Get registered users from localStorage
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const user = users.find(u => u.username === formData.username);
+
+    if (!user) {
+      setError('User not found. Please check your username.');
+      return;
+    }
+
+    if (user.password !== formData.password) {
+      setError('Invalid password. Please try again.');
+      return;
+    }
+
+    // Login successful - set auth state
+    localStorage.setItem('auth', JSON.stringify({ isAuthenticated: true, isAdmin: false, user }));
+    onLogin(true, false);
+    navigate('/dashboard');
   };
 
   const current = IMAGES[idx];
