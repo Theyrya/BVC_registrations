@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './login.css';
 
+const API_BASE = 'http://localhost:5000/api';
+
 const IMAGES = [
   {
     src: 'https://secondnature.org/wp-content/uploads/2025/08/20250610_Sustainability_TagGame_HKA6218_Social-1-1024x768.jpg',
@@ -34,6 +36,7 @@ const Login = ({ onLogin }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
@@ -46,40 +49,44 @@ const Login = ({ onLogin }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
-    // Check for admin login first
-    if (formData.username === 'admin' && formData.password === 'admin123') {
-      const adminUser = {
-        username: 'admin',
-        isAdmin: true
-      };
-      localStorage.setItem('auth', JSON.stringify({ isAuthenticated: true, isAdmin: true, user: adminUser }));
-      onLogin(true, true);
-      navigate('/admin/dashboard');
-      return;
+    try {
+      const response = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: formData.username,
+          password: formData.password
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Login failed. Please try again.');
+        return;
+      }
+
+      // Save auth token and user data to localStorage
+      const { token, user } = data;
+      localStorage.setItem('auth', JSON.stringify({ 
+        isAuthenticated: true, 
+        token,
+        user 
+      }));
+
+      onLogin(true, user.isAdmin);
+      navigate(user.isAdmin ? '/admin/dashboard' : '/dashboard');
+    } catch (err) {
+      setError('Error connecting to server. Make sure the backend is running.');
+      console.error('Login error:', err);
+    } finally {
+      setLoading(false);
     }
-
-    // Get registered users from localStorage
-    const users = JSON.parse(localStorage.getItem('users')) || [];
-    const user = users.find(u => u.username === formData.username);
-
-    if (!user) {
-      setError('User not found. Please check your username.');
-      return;
-    }
-
-    if (user.password !== formData.password) {
-      setError('Invalid password. Please try again.');
-      return;
-    }
-
-    // Login successful - set auth state
-    localStorage.setItem('auth', JSON.stringify({ isAuthenticated: true, isAdmin: false, user }));
-    onLogin(true, false);
-    navigate('/dashboard');
   };
 
   const current = IMAGES[idx];
@@ -127,7 +134,9 @@ const Login = ({ onLogin }) => {
               </label>
 
               <div className="login-actions">
-                <button type="submit" className="login-button">Login</button>
+                <button type="submit" className="login-button" disabled={loading}>
+                  {loading ? 'Logging in...' : 'Login'}
+                </button>
               </div>
             </form>
           </div>

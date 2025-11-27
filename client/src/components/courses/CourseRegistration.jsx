@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { courses as allCourses, TERMS } from '../../data/mockData';
+import { TERMS } from '../../data/mockData';
 import './courseRegistration.css';
 
 const STORAGE_KEY = 'bvc_registrations';
+const API_BASE = 'http://localhost:5000/api';
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
@@ -14,17 +15,42 @@ const CourseRegistration = () => {
   const termFromQuery = query.get('term') || '';
   const [selectedTerm, setSelectedTerm] = useState(termFromQuery);
   const [search, setSearch] = useState('');
+  const [allCourses, setAllCourses] = useState([]);
   const [availableCourses, setAvailableCourses] = useState([]);
   const [registered, setRegistered] = useState([]);
   const [message, setMessage] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  // Fetch courses from backend
   useEffect(() => {
-    // Initialize available courses based on term
+    const fetchCourses = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_BASE}/courses`);
+        if (response.ok) {
+          const data = await response.json();
+          setAllCourses(data);
+        } else {
+          console.error('Failed to fetch courses');
+          setAllCourses([]);
+        }
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+        setAllCourses([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourses();
+  }, []);
+
+  // Filter courses by term
+  useEffect(() => {
     const filtered = selectedTerm
-      ? allCourses.filter((c) => c.term.toLowerCase() === selectedTerm.toLowerCase())
+      ? allCourses.filter((c) => c.term && c.term.toLowerCase() === selectedTerm.toLowerCase())
       : allCourses.slice();
     setAvailableCourses(filtered);
-  }, [selectedTerm]);
+  }, [selectedTerm, allCourses]);
 
   useEffect(() => {
     // load registrations from localStorage (per term)
@@ -36,7 +62,7 @@ const CourseRegistration = () => {
     } catch (e) {
       setRegistered([]);
     }
-  }, [selectedTerm]);
+  }, [selectedTerm, allCourses]);
 
   const persist = (term, registeredList) => {
     try {
@@ -102,6 +128,8 @@ const CourseRegistration = () => {
       <div className="course-container">
       <div className="course-panel">
         <h2 className="course-title">Course Registration</h2>
+
+        {loading && <p className="muted">Loading courses from database...</p>}
 
         <div className="controls">
           <select className="select" value={selectedTerm} onChange={(e) => setSelectedTerm(e.target.value)}>

@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TERMS, courses as allCourses } from '../../data/mockData';
+import { TERMS } from '../../data/mockData';
 import './studentDashboard.css';
 
 const STORAGE_KEY = 'bvc_registrations';
+const API_BASE = 'http://localhost:5000/api';
 
 const StudentDashboard = () => {
   const [selectedTerm, setSelectedTerm] = useState('');
   const [registrations, setRegistrations] = useState({});
   const [studentData, setStudentData] = useState(null);
+  const [allCourses, setAllCourses] = useState([]);
   
   useEffect(() => {
     // Load current user data from auth
@@ -29,6 +31,22 @@ const StudentDashboard = () => {
       console.error('Failed to load registrations:', e);
       setRegistrations({});
     }
+  }, []);
+
+  // Fetch courses from backend
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/courses`);
+        if (response.ok) {
+          const data = await response.json();
+          setAllCourses(data);
+        }
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+      }
+    };
+    fetchCourses();
   }, []);
 
   const handleTermChange = (event) => {

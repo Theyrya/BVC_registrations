@@ -3,8 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { programs } from '../../data/mockData';
 import './signup.css';
 
+const API_BASE = 'http://localhost:5000/api';
+
 const Signup = ({ onSignup }) => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -26,45 +30,75 @@ const Signup = ({ onSignup }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
+    
     // Basic validation
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match.');
+      setError('Passwords do not match.');
       return;
     }
 
-    // Generate a random student ID (in real app this would come from backend)
-    const studentId = 'BVC' + Math.floor(100000 + Math.random() * 900000);
-
-    // Save user to localStorage (simple local mock of registration)
-    const existingUsers = JSON.parse(localStorage.getItem('users')) || [];
-    const duplicate = existingUsers.some(u => u.username === formData.username);
-    if (duplicate) {
-      alert('Username already exists. Choose another username.');
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters.');
       return;
     }
 
-    const user = { ...formData, studentId, isAdmin: false };
-    const updatedUsers = [...existingUsers, user];
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE}/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          birthday: formData.birthday,
+          department: formData.department,
+          program: formData.program,
+          username: formData.username,
+          password: formData.password
+        })
+      });
 
-    // Persist auth state locally so reloads can read it
-    localStorage.setItem('auth', JSON.stringify({ isAuthenticated: true, isAdmin: false, user }));
+      const data = await response.json();
 
-    // If parent provided a handler, call it (backwards-compatible)
-    if (onSignup) onSignup(true, false, user);
+      if (!response.ok) {
+        setError(data.error || 'Signup failed. Please try again.');
+        return;
+      }
 
-    console.log('Registered user:', user);
+      // Save auth token and user data to localStorage
+      const { token, user } = data;
+      localStorage.setItem('auth', JSON.stringify({ 
+        isAuthenticated: true, 
+        token,
+        user 
+      }));
 
-    // Redirect to dashboard after signup
-    navigate('/dashboard');
+      // If parent provided a handler, call it (backwards-compatible)
+      if (onSignup) onSignup(true, user.isAdmin, user);
+
+      console.log('Registered user:', user);
+
+      // Redirect to dashboard after signup
+      navigate('/dashboard');
+    } catch (err) {
+      setError('Error connecting to server. Make sure the backend is running.');
+      console.error('Signup error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="signup-container">
       <div className="signup-paper">
         <h2 className="signup-title">Student Registration</h2>
+
+        {error && <div className="error-message" style={{ color: 'red', marginBottom: '1rem', padding: '0.5rem', backgroundColor: '#ffe6e6', borderRadius: '4px' }}>{error}</div>}
 
         <form onSubmit={handleSubmit} className="signup-form" noValidate>
           <div className="grid">
@@ -191,7 +225,9 @@ const Signup = ({ onSignup }) => {
           </div>
 
           <div className="actions">
-            <button type="submit" className="submit-button">Sign Up</button>
+            <button type="submit" className="submit-button" disabled={loading}>
+              {loading ? 'Signing Up...' : 'Sign Up'}
+            </button>
           </div>
         </form>
       </div>
