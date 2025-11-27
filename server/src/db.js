@@ -8,12 +8,15 @@ async function getPool() {
   }
   const config = {
     user: process.env.DB_USER || 'sa',
-    password: process.env.DB_PASS || '',
-    server: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '1433', 10),
-    database: process.env.DB_NAME || 'bvc_registrations',
+    password: process.env.DB_PASSWORD || '',
+    server: process.env.DB_SERVER || 'localhost',
+    database: process.env.DB_DATABASE || 'bvc_registrations',
+    authentication: {
+      type: 'default',
+    },
     options: {
-      trustServerCertificate: true,
+      trustServerCertificate: process.env.DB_TRUST_SERVER_CERT === 'true' || true,
+      encrypt: true,
     },
     pool: {
       max: 10,
