@@ -79,7 +79,7 @@ const Signup = ({ onSignup }) => {
       }));
 
       // If parent provided a handler, call it (backwards-compatible)
-      if (onSignup) onSignup(true, user.isAdmin, user);
+      if (onSignup) onSignup(true, user.isAdmin, user, token);
 
       console.log('Registered user:', user);
 

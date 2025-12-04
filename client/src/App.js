@@ -16,30 +16,74 @@ import AdminCourses from './components/admin/AdminCourses.jsx';
 import './App.css';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
-
-  // restore auth from localStorage on mount
-  useEffect(() => {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
     try {
-      const stored = JSON.parse(localStorage.getItem('auth'));
-      if (stored && stored.isAuthenticated) {
-        setIsAuthenticated(true);
-        setIsAdmin(!!stored.isAdmin);
-        setCurrentUser(stored.user || null);
-      }
+      const s = JSON.parse(localStorage.getItem('auth'));
+      return !!(s && s.isAuthenticated);
     } catch (e) {
-      // ignore
+      return false;
     }
+  });
+  const [isAdmin, setIsAdmin] = useState(() => {
+    try {
+      const s = JSON.parse(localStorage.getItem('auth'));
+      return !!(s && s.isAdmin);
+    } catch (e) {
+      return false;
+    }
+  });
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const s = JSON.parse(localStorage.getItem('auth'));
+      return (s && s.user) || null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  // On mount, if we have a token, fetch fresh user profile from backend
+  useEffect(() => {
+    const tryRefresh = async () => {
+      try {
+        const s = JSON.parse(localStorage.getItem('auth')) || {};
+        const token = s.token;
+        if (!token) return;
+        const resp = await fetch('http://localhost:5000/api/auth/me', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!resp.ok) return;
+        const data = await resp.json();
+        if (data && data.user) {
+          setCurrentUser(data.user);
+          setIsAdmin(!!data.user.isAdmin);
+          setIsAuthenticated(true);
+          // update localStorage with refreshed user
+          localStorage.setItem('auth', JSON.stringify({ ...(s || {}), isAuthenticated: true, isAdmin: !!data.user.isAdmin, user: data.user, token }));
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+    tryRefresh();
   }, []);
 
-  const handleAuth = (auth, admin = false, user = null) => {
+  const handleAuth = (auth, admin = false, user = null, token = null) => {
     setIsAuthenticated(!!auth);
     setIsAdmin(!!admin);
     setCurrentUser(user || null);
     if (auth) {
-      localStorage.setItem('auth', JSON.stringify({ isAuthenticated: true, isAdmin: admin, user }));
+      // preserve existing token if caller didn't provide one
+      try {
+        const stored = JSON.parse(localStorage.getItem('auth')) || {};
+        const effectiveToken = token || stored.token || null;
+        const out = { isAuthenticated: true, isAdmin: admin, user: user || stored.user || null };
+        if (effectiveToken) out.token = effectiveToken;
+        localStorage.setItem('auth', JSON.stringify(out));
+      } catch (e) {
+        const out = { isAuthenticated: true, isAdmin: admin, user };
+        if (token) out.token = token;
+        try { localStorage.setItem('auth', JSON.stringify(out)); } catch (_) {}
+      }
     } else {
       localStorage.removeItem('auth');
     }

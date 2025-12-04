@@ -1,82 +1,125 @@
 import React, { useEffect, useState } from 'react';
-import { courses as defaultCourses } from '../../data/mockData';
 import './adminDashboard.css';
 
-const CUSTOM_COURSES_KEY = 'bvc_custom_courses';
-
 const AdminCourses = () => {
-  const [customCourses, setCustomCourses] = useState([]);
-  const [newCourse, setNewCourse] = useState({ code: '', name: '', term: 'Winter', credits: 3 });
+  const [courses, setCourses] = useState([]);
+  const [newCourse, setNewCourse] = useState({ code: '', name: '', term: 'Winter', credits: 3, description: '' });
+  const [editingCourse, setEditingCourse] = useState(null);
 
-  useEffect(() => {
+  const loadCourses = async () => {
     try {
-      const raw = localStorage.getItem(CUSTOM_COURSES_KEY);
-      setCustomCourses(raw ? JSON.parse(raw) : []);
-    } catch (e) { setCustomCourses([]); }
-  }, []);
-
-  const saveCustom = (next) => {
-    setCustomCourses(next);
-    localStorage.setItem(CUSTOM_COURSES_KEY, JSON.stringify(next));
+      const resp = await fetch('http://localhost:5000/api/courses');
+      if (resp.ok) setCourses(await resp.json());
+    } catch (e) { console.error('Failed to load courses', e); }
   };
 
-  const handleAddCourse = () => {
-    const course = { id: Date.now(), ...newCourse };
-    const next = [...customCourses, course];
-    saveCustom(next);
-    setNewCourse({ code: '', name: '', term: 'Winter', credits: 3 });
+  useEffect(() => { loadCourses(); }, []);
+
+  const handleAddCourse = async () => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('auth')) || {};
+      const token = stored.token;
+      if (!token) return alert('Not authenticated');
+      const resp = await fetch('http://localhost:5000/api/courses', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(newCourse) });
+      if (!resp.ok) throw new Error('Failed to create');
+      setNewCourse({ code: '', name: '', term: 'Winter', credits: 3, description: '' });
+      await loadCourses();
+    } catch (e) {
+      console.error(e);
+      alert('Failed to add course');
+    }
   };
 
-  const handleRemoveCustom = (id) => {
-    const next = customCourses.filter(c => c.id !== id);
-    saveCustom(next);
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this course?')) return;
+    try {
+      const stored = JSON.parse(localStorage.getItem('auth')) || {};
+      const token = stored.token;
+      if (!token) return alert('Not authenticated');
+      const resp = await fetch(`http://localhost:5000/api/courses/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+      if (!resp.ok) throw new Error('Delete failed');
+      await loadCourses();
+    } catch (e) {
+      console.error(e);
+      alert('Failed to delete course');
+    }
   };
 
-  const allCourses = [...defaultCourses, ...customCourses];
+  const handleEdit = (course) => {
+    setEditingCourse({ ...course });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCourse(null);
+  };
+
+  const handleUpdateCourse = async () => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('auth')) || {};
+      const token = stored.token;
+      if (!token) return alert('Not authenticated');
+      const resp = await fetch(`http://localhost:5000/api/courses/${editingCourse.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(editingCourse)
+      });
+      if (!resp.ok) throw new Error('Failed to update');
+      setEditingCourse(null);
+      await loadCourses();
+    } catch (e) {
+      console.error(e);
+      alert('Failed to update course');
+    }
+  };
 
   return (
     <div className="admin-container">
       <h3 className="admin-title">Manage Courses</h3>
 
       <section className="panel full">
-        <h4>Default Courses ({defaultCourses.length})</h4>
-        <div className="course-list">
-          {defaultCourses.map(c => (
-            <div key={c.id} className="course-card">
-              <div>
-                <div className="course-title">{c.code} — {c.name}</div>
-                <div className="course-meta">Term: {c.term} — Credits: {c.credits}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <h4 style={{ marginTop: 24 }}>Custom Courses ({customCourses.length})</h4>
+        <h4>Add New Course</h4>
         <div className="form-row">
           <input className="small-input" placeholder="Code" value={newCourse.code} onChange={e => setNewCourse(prev => ({ ...prev, code: e.target.value }))} />
           <input className="flex-input" placeholder="Name" value={newCourse.name} onChange={e => setNewCourse(prev => ({ ...prev, name: e.target.value }))} />
           <input className="small-input" placeholder="Term" value={newCourse.term} onChange={e => setNewCourse(prev => ({ ...prev, term: e.target.value }))} />
           <input className="tiny-input" placeholder="Credits" type="number" value={newCourse.credits} onChange={e => setNewCourse(prev => ({ ...prev, credits: Number(e.target.value) }))} />
+          <input className="flex-input" placeholder="Description" value={newCourse.description} onChange={e => setNewCourse(prev => ({ ...prev, description: e.target.value }))} />
           <button type="button" className="btn btn-primary" onClick={handleAddCourse}>Add</button>
         </div>
+      </section>
 
-        {customCourses.length === 0 ? (
-          <p className="muted">No custom courses added.</p>
-        ) : (
-          <div className="course-list">
-            {customCourses.map(c => (
-              <div key={c.id} className="course-card">
-                <div>
-                  <div className="course-title">{c.code} — {c.name}</div>
-                  <div className="course-meta">Term: {c.term} — Credits: {c.credits}</div>
+      <section className="panel full" style={{ marginTop: '24px' }}>
+        <h4>All Courses ({courses.length})</h4>
+        <div className="course-list-scrollable">
+          {courses.map(c => (
+            <div key={c.id} className="course-card">
+              {editingCourse && editingCourse.id === c.id ? (
+                <div className="edit-course-form">
+                  <div className="form-row">
+                    <input className="small-input" placeholder="Code" value={editingCourse.code} onChange={e => setEditingCourse(prev => ({ ...prev, code: e.target.value }))} />
+                    <input className="flex-input" placeholder="Name" value={editingCourse.name} onChange={e => setEditingCourse(prev => ({ ...prev, name: e.target.value }))} />
+                    <input className="small-input" placeholder="Term" value={editingCourse.term} onChange={e => setEditingCourse(prev => ({ ...prev, term: e.target.value }))} />
+                    <input className="tiny-input" placeholder="Credits" type="number" value={editingCourse.credits} onChange={e => setEditingCourse(prev => ({ ...prev, credits: Number(e.target.value) }))} />
+                    <input className="flex-input" placeholder="Description" value={editingCourse.description} onChange={e => setEditingCourse(prev => ({ ...prev, description: e.target.value }))} />
+                    <button type="button" className="btn btn-success" onClick={handleUpdateCourse}>Save</button>
+                    <button type="button" className="btn btn-secondary" onClick={handleCancelEdit}>Cancel</button>
+                  </div>
                 </div>
-                <div>
-                  <button type="button" className="btn btn-danger" onClick={() => handleRemoveCustom(c.id)}>Remove</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ) : (
+                <>
+                  <div>
+                    <div className="course-title">{c.code} — {c.name}</div>
+                    <div className="course-meta">Term: {c.term} — Credits: {c.credits}</div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button type="button" className="btn btn-edit" onClick={() => handleEdit(c)}>Edit</button>
+                    <button type="button" className="btn btn-danger" onClick={() => handleDelete(c.id)}>Remove</button>
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
       </section>
     </div>
   );

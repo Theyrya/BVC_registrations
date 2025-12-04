@@ -6,6 +6,7 @@ const authRoutes = require('./routes/auth');
 const coursesRoutes = require('./routes/courses');
 const registrationsRoutes = require('./routes/registrations');
 const messagesRoutes = require('./routes/messages');
+const adminRouter = require('./routes/admin');
 
 const app = express();
 app.use(cors());
@@ -18,6 +19,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/courses', coursesRoutes);
 app.use('/api/registrations', registrationsRoutes);
 app.use('/api/messages', messagesRoutes);
+app.use('/api/admin', adminRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

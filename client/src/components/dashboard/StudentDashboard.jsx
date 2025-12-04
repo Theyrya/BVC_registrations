@@ -66,9 +66,9 @@ const StudentDashboard = () => {
           {studentData ? (
             <div className="info">
               <p><strong>Name:</strong> {studentData.firstName} {studentData.lastName}</p>
-              <p><strong>Student ID:</strong> {studentData.studentId}</p>
-              <p><strong>Program:</strong> {studentData.program}</p>
-              <p><strong>Department:</strong> {studentData.department}</p>
+              <p><strong>Student ID:</strong> {studentData.studentId || studentData.id || '—'}</p>
+              <p><strong>Program:</strong> {studentData.program || '—'}</p>
+              <p><strong>Department:</strong> {studentData.department || '—'}</p>
             </div>
           ) : (
             <p className="muted">Loading student information...</p>

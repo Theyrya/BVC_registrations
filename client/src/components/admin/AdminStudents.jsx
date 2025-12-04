@@ -1,31 +1,52 @@
 import React, { useEffect, useState } from 'react';
 import './adminDashboard.css';
 
-const USERS_KEY = 'users';
-
 const AdminStudents = () => {
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState('');
 
-  useEffect(() => {
+  const loadUsers = async () => {
     try {
-      const raw = localStorage.getItem(USERS_KEY);
-      setUsers(raw ? JSON.parse(raw) : []);
+      const stored = JSON.parse(localStorage.getItem('auth')) || {};
+      const token = stored.token;
+      if (!token) return;
+      const resp = await fetch('http://localhost:5000/api/admin/users', { headers: { Authorization: `Bearer ${token}` } });
+      if (resp.ok) {
+        const data = await resp.json();
+        setUsers(data);
+      }
     } catch (e) {
-      setUsers([]);
-    }
-  }, []);
-
-  const handleRemove = (username) => {
-    if (!confirm('Remove this student?')) return;
-    const next = users.filter(u => u.username !== username);
-    setUsers(next);
-    try {
-      localStorage.setItem(USERS_KEY, JSON.stringify(next));
-    } catch (e) {
-      console.error('Failed to update users in localStorage', e);
+      console.error('Failed to load users', e);
     }
   };
+
+  useEffect(() => { loadUsers(); }, []);
+
+  const handleRemove = async (id) => {
+    if (!confirm('Remove this student?')) return;
+    try {
+      const stored = JSON.parse(localStorage.getItem('auth')) || {};
+      const token = stored.token;
+      if (!token) return alert('Not authenticated');
+      const resp = await fetch(`http://localhost:5000/api/admin/users/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+      if (!resp.ok) throw new Error('Failed to delete');
+      // refresh list
+      await loadUsers();
+    } catch (e) {
+      console.error(e);
+      alert('Failed to remove user');
+    }
+  };
+
+  // fallback: use localStorage if API fails or token missing
+  useEffect(() => {
+    if (!users || users.length === 0) {
+      try {
+        const raw = localStorage.getItem('users');
+        if (raw) setUsers(JSON.parse(raw));
+      } catch (e) {}
+    }
+  }, [users]);
 
   const filtered = users.filter(u => {
     const q = filter.trim().toLowerCase();
@@ -67,7 +88,7 @@ const AdminStudents = () => {
                   <small className="card-meta">Username: {u.username}</small>
                 </div>
                 <div>
-                  <button className="btn btn-danger" onClick={() => handleRemove(u.username)}>Remove</button>
+                  <button className="btn btn-danger" onClick={() => handleRemove(u.id)}>Remove</button>
                 </div>
               </div>
             </article>

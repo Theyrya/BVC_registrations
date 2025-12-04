@@ -8,17 +8,19 @@ const STORAGE_KEY = 'bvc_registrations';
 const Profile = () => {
   const navigate = useNavigate();
   const [registrations, setRegistrations] = useState({});
-
-  // Mock student data for frontend-only
-  const studentData = {
-    firstName: 'John',
-    lastName: 'Doe',
-    studentId: 'BVC123456',
-    program: 'Software Development - Diploma',
-    department: 'SD'
-  };
+  const [studentData, setStudentData] = useState(null);
 
   useEffect(() => {
+    // Load current user data from auth (same approach as StudentDashboard)
+    try {
+      const stored = JSON.parse(localStorage.getItem('auth'));
+      if (stored && stored.user) {
+        setStudentData(stored.user);
+      }
+    } catch (e) {
+      // ignore and fall back to null
+    }
+
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       const parsed = raw ? JSON.parse(raw) : {};
@@ -43,10 +45,16 @@ const Profile = () => {
         <h2 className="profile-title">Profile</h2>
 
         <div className="profile-info">
-          <p><strong>Name:</strong> {studentData.firstName} {studentData.lastName}</p>
-          <p><strong>Student ID:</strong> {studentData.studentId}</p>
-          <p><strong>Program:</strong> {studentData.program}</p>
-          <p><strong>Department:</strong> {studentData.department}</p>
+          {studentData ? (
+            <>
+              <p><strong>Name:</strong> {studentData.firstName} {studentData.lastName}</p>
+              <p><strong>Student ID:</strong> {studentData.studentId || studentData.id || '—'}</p>
+              <p><strong>Program:</strong> {studentData.program || '—'}</p>
+              <p><strong>Department:</strong> {studentData.department || '—'}</p>
+            </>
+          ) : (
+            <p className="muted">Loading student information...</p>
+          )}
         </div>
 
         <h3 className="section-title">Registered Courses (by term)</h3>

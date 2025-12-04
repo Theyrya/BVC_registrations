@@ -1,23 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import './adminDashboard.css';
 
-const MESSAGES_KEY = 'bvc_messages';
-const USERS_KEY = 'users';
-
 const AdminDashboard = () => {
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);
 
-  useEffect(() => {
+  const fetchData = async () => {
     try {
-      const raw = localStorage.getItem(MESSAGES_KEY);
-      setMessages(raw ? JSON.parse(raw) : []);
-    } catch (e) { setMessages([]); }
+      const stored = JSON.parse(localStorage.getItem('auth')) || {};
+      const token = stored.token;
+      // fetch messages
+      if (token) {
+        const mResp = await fetch('http://localhost:5000/api/messages', { headers: { Authorization: `Bearer ${token}` } });
+        if (mResp.ok) setMessages(await mResp.json());
+        const uResp = await fetch('http://localhost:5000/api/admin/users', { headers: { Authorization: `Bearer ${token}` } });
+        if (uResp.ok) setUsers(await uResp.json());
+      }
+    } catch (e) {
+      console.error('Failed to load admin data', e);
+    }
+  };
 
-    try {
-      const raw = localStorage.getItem(USERS_KEY);
-      setUsers(raw ? JSON.parse(raw) : []);
-    } catch (e) { setUsers([]); }
+  useEffect(() => {
+    fetchData();
   }, []);
 
   // Methods moved to AdminCourses.jsx
@@ -35,8 +40,8 @@ const AdminDashboard = () => {
             <article key={m.id} className="card">
               <div className="card-body">
                 <strong className="card-subject">{m.subject}</strong>
-                <p className="card-text">{m.message}</p>
-                <small className="card-meta">From: {m.from} — {new Date(m.timestamp).toLocaleString()}</small>
+                <p className="card-text">{m.body || m.message}</p>
+                <small className="card-meta">From: {m.fromName || m.name || m.from || m.email || 'Student'} — {new Date(m.createdAt || m.timestamp || m.createdAt || Date.now()).toLocaleString()}</small>
               </div>
             </article>
           ))}

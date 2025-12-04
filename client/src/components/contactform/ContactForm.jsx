@@ -13,12 +13,40 @@ const ContactForm = () => {
     e.preventDefault();
     if (!form.subject || !form.message) return setSuccess({ type: 'error', text: 'Please fill subject and message' });
     try {
-      const raw = localStorage.getItem(MESSAGES_KEY);
-      const parsed = raw ? JSON.parse(raw) : [];
-      parsed.push({ id: Date.now(), subject: form.subject, message: form.message, timestamp: new Date().toISOString(), from: 'student' });
-      localStorage.setItem(MESSAGES_KEY, JSON.stringify(parsed));
-      setForm({ subject: '', message: '' });
-      setSuccess({ type: 'success', text: 'Message submitted. Admin can view it in the Admin Dashboard.' });
+      // If logged in, try to POST to API with user's name/email. Otherwise save locally.
+      const stored = JSON.parse(localStorage.getItem('auth')) || {};
+      const token = stored.token;
+      const user = stored.user || null;
+
+      if (token) {
+        // send to backend
+        fetch('http://localhost:5000/api/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ name: user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username : 'Student', email: user ? user.email : '', subject: form.subject, body: form.message })
+        }).then(async (resp) => {
+          if (!resp.ok) throw new Error('Failed to send message');
+          setForm({ subject: '', message: '' });
+          setSuccess({ type: 'success', text: 'Message submitted. Admin can view it in the Admin Dashboard.' });
+        }).catch(err => {
+          console.error('Failed to send to server, saving locally', err);
+          const raw = localStorage.getItem(MESSAGES_KEY);
+          const parsed = raw ? JSON.parse(raw) : [];
+          const from = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username : 'student';
+          parsed.push({ id: Date.now(), subject: form.subject, message: form.message, timestamp: new Date().toISOString(), from });
+          localStorage.setItem(MESSAGES_KEY, JSON.stringify(parsed));
+          setForm({ subject: '', message: '' });
+          setSuccess({ type: 'success', text: 'Message saved locally. Admin can view it in the Admin Dashboard.' });
+        });
+      } else {
+        const raw = localStorage.getItem(MESSAGES_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        const from = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username : 'student';
+        parsed.push({ id: Date.now(), subject: form.subject, message: form.message, timestamp: new Date().toISOString(), from });
+        localStorage.setItem(MESSAGES_KEY, JSON.stringify(parsed));
+        setForm({ subject: '', message: '' });
+        setSuccess({ type: 'success', text: 'Message submitted. Admin can view it in the Admin Dashboard.' });
+      }
     } catch (err) {
       setSuccess({ type: 'error', text: 'Failed to save message locally.' });
     }

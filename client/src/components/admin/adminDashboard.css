@@ -43,10 +43,48 @@
 .btn-primary:hover { background-color: #1565c0; }
 .btn-danger { background-color: #d32f2f; color: #fff; }
 .btn-danger:hover { background-color: #b71c1c; }
+.btn-edit { background-color: #f57c00; color: #fff; }
+.btn-edit:hover { background-color: #e65100; }
+.btn-success { background-color: #2e7d32; color: #fff; }
+.btn-success:hover { background-color: #1b5e20; }
+.btn-secondary { background-color: #757575; color: #fff; }
+.btn-secondary:hover { background-color: #616161; }
 
 .course-card { display: flex; justify-content: space-between; align-items: center; padding: 10px; border: 1px solid #f0f0f0; border-radius: 6px; margin-top: 10px; }
 .course-title { font-weight: 600; }
 .course-meta { color: #666; font-size: 0.9rem; }
+
+.edit-course-form {
+  width: 100%;
+}
+
+.edit-course-form .form-row {
+  width: 100%;
+}
+
+.course-list-scrollable {
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.course-list-scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.course-list-scrollable::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.course-list-scrollable::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.course-list-scrollable::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
 
 @media (max-width: 800px) {
   .admin-grid { grid-template-columns: 1fr; }

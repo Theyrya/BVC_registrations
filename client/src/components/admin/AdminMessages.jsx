@@ -1,31 +1,59 @@
 import React, { useEffect, useState } from 'react';
 import './adminDashboard.css';
 
-const MESSAGES_KEY = 'bvc_messages';
-
 const AdminMessages = () => {
   const [messages, setMessages] = useState([]);
 
-  useEffect(() => {
+  const fetchMessages = async () => {
     try {
-      const raw = localStorage.getItem(MESSAGES_KEY);
-      setMessages(raw ? JSON.parse(raw) : []);
+      const stored = JSON.parse(localStorage.getItem('auth')) || {};
+      const token = stored.token;
+      if (token) {
+        const resp = await fetch('http://localhost:5000/api/messages', { headers: { Authorization: `Bearer ${token}` } });
+        if (resp.ok) {
+          const data = await resp.json();
+          setMessages(data || []);
+        }
+      }
     } catch (e) {
-      setMessages([]);
+      console.error('Failed to fetch messages from API', e);
     }
-  }, []);
-
-  const handleRemove = (id) => {
-    if (!confirm('Remove this message?')) return;
-    const next = messages.filter(m => m.id !== id);
-    setMessages(next);
-    try { localStorage.setItem(MESSAGES_KEY, JSON.stringify(next)); } catch (e) { console.error(e); }
   };
 
-  const handleClearAll = () => {
-    if (!confirm('Clear all messages?')) return;
-    setMessages([]);
-    try { localStorage.removeItem(MESSAGES_KEY); } catch (e) { console.error(e); }
+  useEffect(() => { fetchMessages(); }, []);
+
+  const handleRemove = async (id) => {
+    if (!window.confirm('Remove this message?')) return;
+    try {
+      const stored = JSON.parse(localStorage.getItem('auth')) || {};
+      const token = stored.token;
+      if (token) {
+        const resp = await fetch(`http://localhost:5000/api/messages/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+        if (resp.ok) {
+          setMessages(prev => prev.filter(m => m.id !== id));
+        }
+      }
+    } catch (e) {
+      console.error('Failed to delete message via API', e);
+      alert('Failed to delete message');
+    }
+  };
+
+  const handleClearAll = async () => {
+    if (!window.confirm('Clear all messages?')) return;
+    try {
+      const stored = JSON.parse(localStorage.getItem('auth')) || {};
+      const token = stored.token;
+      if (token) {
+        const resp = await fetch('http://localhost:5000/api/messages', { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+        if (resp.ok) {
+          setMessages([]);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to clear messages via API', e);
+      alert('Failed to clear messages');
+    }
   };
 
   return (
@@ -47,8 +75,8 @@ const AdminMessages = () => {
             <article key={m.id} className="card">
               <div className="card-body">
                 <strong className="card-subject">{m.subject}</strong>
-                <p className="card-text">{m.message}</p>
-                <small className="card-meta">From: {m.from} — {new Date(m.timestamp).toLocaleString()}</small>
+                <p className="card-text">{m.body || m.message}</p>
+                <small className="card-meta">From: {m.fromName || m.name || m.from || m.email || 'Student'} — {new Date(m.createdAt || m.timestamp || Date.now()).toLocaleString()}</small>
                 <div style={{ marginTop: 8 }}>
                   <button className="btn btn-danger" onClick={() => handleRemove(m.id)}>Remove</button>
                 </div>
