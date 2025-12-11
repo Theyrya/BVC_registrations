@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { courses as allCourses } from '../../data/mockData';
+import { courses as MOCK_COURSES } from '../../data/mockData';
 import './profile.css';
 
 const STORAGE_KEY = 'bvc_registrations';
+const API_BASE = 'http://localhost:5000/api';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -21,19 +22,39 @@ const Profile = () => {
       // ignore and fall back to null
     }
 
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      const parsed = raw ? JSON.parse(raw) : {};
-      // Map ids back to course objects
-      const mapped = {};
-      Object.keys(parsed).forEach(term => {
-        mapped[term] = (parsed[term] || []).map(id => allCourses.find(c => c.id === id)).filter(Boolean);
-      });
-      setRegistrations(mapped);
-    } catch (e) {
-      setRegistrations({});
-    }
+    const load = async () => {
+      try {
+        // Try fetch courses from API first
+        let courses = [];
+        try {
+          const resp = await fetch(`${API_BASE}/courses`);
+          if (resp.ok) courses = await resp.json();
+        } catch (_) {
+          // ignore network errors
+        }
+        if (!courses || courses.length === 0) courses = MOCK_COURSES || [];
+
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : {};
+        // Map ids back to course objects using fetched courses.
+        // Be tolerant of id types (string vs number) when matching.
+        const mapped = {};
+        Object.keys(parsed).forEach(term => {
+          mapped[term] = (parsed[term] || []).map(id => {
+            const numId = Number(id);
+            return courses.find(c => c.id === numId || String(c.id) === String(id));
+          }).filter(Boolean);
+        });
+        setRegistrations(mapped);
+      } catch (e) {
+        setRegistrations({});
+      }
+    };
+    load();
   }, []);
+
+  // Expose raw storage for debugging when no registrations found
+  const [showRaw, setShowRaw] = React.useState(false);
 
   const handleGoToTerm = (term) => {
     navigate(`/course-registration?term=${encodeURIComponent(term)}`);

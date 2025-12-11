@@ -83,8 +83,8 @@ const Signup = ({ onSignup }) => {
 
       console.log('Registered user:', user);
 
-      // Redirect to dashboard after signup
-      navigate('/dashboard');
+      // Redirect to root (dashboard view at `/`) after signup
+      navigate('/');
     } catch (err) {
       setError('Error connecting to server. Make sure the backend is running.');
       console.error('Signup error:', err);

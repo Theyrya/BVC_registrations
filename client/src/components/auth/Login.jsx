@@ -80,7 +80,8 @@ const Login = ({ onLogin }) => {
       }));
 
       onLogin(true, user.isAdmin, user, token);
-      navigate(user.isAdmin ? '/admin/dashboard' : '/dashboard');
+      // Redirect admin users to admin dashboard, normal users to root
+      navigate(user.isAdmin ? '/admin/dashboard' : '/');
     } catch (err) {
       setError('Error connecting to server. Make sure the backend is running.');
       console.error('Login error:', err);

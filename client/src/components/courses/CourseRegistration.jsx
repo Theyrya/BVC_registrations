@@ -18,6 +18,8 @@ const CourseRegistration = () => {
   const [allCourses, setAllCourses] = useState([]);
   const [availableCourses, setAvailableCourses] = useState([]);
   const [registered, setRegistered] = useState([]);
+  // map of courseId -> registrationId (DB id)
+  const [regMap, setRegMap] = useState({});
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -53,15 +55,45 @@ const CourseRegistration = () => {
   }, [selectedTerm, allCourses]);
 
   useEffect(() => {
-    // load registrations from localStorage (per term)
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      const parsed = raw ? JSON.parse(raw) : {};
-      const termRegistered = (parsed[selectedTerm] || []).map((id) => allCourses.find(c => c.id === id)).filter(Boolean);
-      setRegistered(termRegistered);
-    } catch (e) {
-      setRegistered([]);
-    }
+    // load registrations from server if authenticated, otherwise from localStorage
+    const load = async () => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : {};
+        // optimistic local fallback
+        const localTermIds = (parsed[selectedTerm] || []).map(id => Number(id));
+        const localTermRegistered = localTermIds.map((id) => allCourses.find(c => c.id === id)).filter(Boolean);
+        setRegistered(localTermRegistered);
+
+        // if authenticated, fetch from server and prefer server data
+        const storedAuth = JSON.parse(localStorage.getItem('auth') || 'null');
+        const token = storedAuth && storedAuth.token;
+        if (token) {
+          const resp = await fetch(`${API_BASE}/registrations`, { headers: { Authorization: `Bearer ${token}` } });
+          if (resp.ok) {
+            const data = await resp.json();
+            // data = array of registration records { id, studentId, courseId, term, code, name }
+            const forTerm = data.filter(r => String(r.term).toLowerCase() === String(selectedTerm).toLowerCase());
+            const coursesForTerm = forTerm.map(r => allCourses.find(c => c.id === r.courseId)).filter(Boolean);
+            setRegistered(coursesForTerm);
+            // build regMap
+            const map = {};
+            forTerm.forEach(r => { map[r.courseId] = r.id; });
+            setRegMap(map);
+            // persist server-backed ids into localStorage for offline display
+            try {
+              const allParsed = raw ? JSON.parse(raw) : {};
+              allParsed[selectedTerm] = forTerm.map(r => r.courseId);
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(allParsed));
+            } catch (_e) {}
+          }
+        }
+      } catch (e) {
+        // swallow and keep local registered
+        console.error('Failed loading registrations:', e);
+      }
+    };
+    load();
   }, [selectedTerm, allCourses]);
 
   const persist = (term, registeredList) => {
@@ -94,6 +126,34 @@ const CourseRegistration = () => {
     const next = [...registered, course];
     setRegistered(next);
     persist(selectedTerm, next);
+
+    // if authenticated, persist to server as well
+    try {
+      const stored = JSON.parse(localStorage.getItem('auth')) || {};
+      const token = stored.token;
+      if (token) {
+        (async () => {
+          try {
+            const resp = await fetch(`${API_BASE}/registrations`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ courseId: course.id, term: selectedTerm })
+            });
+            if (resp.ok) {
+              const created = await resp.json();
+              setRegMap(prev => ({ ...prev, [course.id]: created.id }));
+            } else {
+              // server save failed; inform user but keep local
+              setMessage({ type: 'warning', text: 'Saved locally; server save failed.' });
+            }
+          } catch (e) {
+            // network error
+            setMessage({ type: 'warning', text: 'Saved locally; server save failed.' });
+          }
+        })();
+      }
+    } catch (e) {}
+
     setMessage({ type: 'success', text: `${course.code} added.` });
   };
 
@@ -101,6 +161,28 @@ const CourseRegistration = () => {
     const next = registered.filter((c) => c.id !== course.id);
     setRegistered(next);
     persist(selectedTerm, next);
+
+    // if authenticated and we have a reg id, delete on server
+    try {
+      const stored = JSON.parse(localStorage.getItem('auth')) || {};
+      const token = stored.token;
+      const regId = regMap[course.id];
+      if (token && regId) {
+        (async () => {
+          try {
+            const resp = await fetch(`${API_BASE}/registrations/${regId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+            if (resp.ok) {
+              setRegMap(prev => { const n = { ...prev }; delete n[course.id]; return n; });
+            } else {
+              setMessage({ type: 'warning', text: 'Removed locally; server remove failed.' });
+            }
+          } catch (e) {
+            setMessage({ type: 'warning', text: 'Removed locally; server remove failed.' });
+          }
+        })();
+      }
+    } catch (e) {}
+
     setMessage({ type: 'info', text: `${course.code} removed.` });
   };
 
