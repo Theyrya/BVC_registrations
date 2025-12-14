@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './contactForm.css';
 
 const MESSAGES_KEY = 'bvc_messages';
@@ -6,6 +6,12 @@ const MESSAGES_KEY = 'bvc_messages';
 const ContactForm = () => {
   const [form, setForm] = useState({ subject: '', message: '' });
   const [success, setSuccess] = useState(null);
+   
+  useEffect(() => {
+  document.body.classList.add('no-hero');
+  return () => document.body.classList.remove('no-hero');
+}, []);
+
 
   const handleChange = (e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
