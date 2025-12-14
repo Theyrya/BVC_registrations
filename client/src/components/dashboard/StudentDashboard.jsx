@@ -7,6 +7,11 @@ const STORAGE_KEY = 'bvc_registrations';
 const API_BASE = 'http://localhost:5000/api';
 
 const StudentDashboard = () => {
+    useEffect(() => {
+  document.body.classList.add('dashboard-route')
+  return () => {
+    document.body.classList.remove('dashboard-route');
+  };},[]);
   const [selectedTerm, setSelectedTerm] = useState('');
   const [registrations, setRegistrations] = useState({});
   const [studentData, setStudentData] = useState(null);
@@ -59,6 +64,7 @@ const StudentDashboard = () => {
     navigate(`/course-registration?term=${encodeURIComponent(selectedTerm)}`);
   };
   return (
+    <div className='dashboard-page'>
     <div className="student-container">
       <div className="student-grid">
         <section className="panel student-info">
@@ -122,6 +128,7 @@ const StudentDashboard = () => {
           </div>
         </section>
       </div>
+    </div>
     </div>
   );
 };
