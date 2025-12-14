@@ -5,6 +5,17 @@
   padding: 0 1rem;
 }
 
+body.no-hero .programs-hero,
+body.no-hero .hero,
+body.no-hero .hero-section,
+body.no-hero .home-hero,
+body.no-hero .page-hero,
+body.no-hero .banner-image,
+body.no-hero img.hero-image,
+body.no-hero img {
+  display: none !important;
+}
+
 .contact-panel {
   background: #fff;
   padding: 20px;
