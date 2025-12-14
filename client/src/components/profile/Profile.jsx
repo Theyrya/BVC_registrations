@@ -10,6 +10,11 @@ const Profile = () => {
   const navigate = useNavigate();
   const [registrations, setRegistrations] = useState({});
   const [studentData, setStudentData] = useState(null);
+    useEffect(() => {
+  document.body.classList.add("no-hero");
+  return () => {
+    document.body.classList.remove("no-hero");
+  };},[]);
 
   useEffect(() => {
     // Load current user data from auth (same approach as StudentDashboard)
