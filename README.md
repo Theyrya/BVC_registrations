@@ -71,5 +71,23 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 =======
 # BVC_registrations
-This site will let students to register their courses
->>>>>>> 5dfe36e80e69d1624c35d6a0a118ea7a3a03feda
+College Course Registration System
+React, Node.js, Express, MySQL
+
+Developed a full-stack web application that enables students to register, manage, and track their college courses through a centralized, database-driven platform.
+
+Built a responsive React frontend for course browsing, registration, and schedule management
+
+Designed a RESTful backend using Node.js and Express to handle student, course, and enrollment logic
+
+Implemented a MySQL relational database with structured tables for students, courses, and registrations
+
+Applied foreign keys and relational constraints to maintain data integrity across enrollments
+
+Enabled CRUD operations for course registration, updates, and withdrawals
+
+Implemented server-side validation to prevent duplicate registrations and over-capacity enrollments
+
+Focused on scalable architecture, clean API design, and real-world academic workflows
+
+This project simulates a real college registration system and demonstrates practical full-stack development using a relational database.>>>>>>> 5dfe36e80e69d1624c35d6a0a118ea7a3a03feda
